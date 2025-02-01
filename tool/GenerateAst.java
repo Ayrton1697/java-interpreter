@@ -31,7 +31,7 @@ public class GenerateAst {
         writer.println();
         writer.println("import java.util.List;");
         writer.println();
-        writer.println("abstract class" + baseName + " {");
+        writer.println("abstract class " + baseName + " {");
 
         defineVisitor(writer,baseName,types);
         
@@ -40,6 +40,9 @@ public class GenerateAst {
             String fields = type.split(":")[1].trim();
             defineType(writer, baseName,className, fields);
         }
+
+        writer.println();
+        writer.println(" abstract <R> R accept(Visitor<R> visitor);");
 
         writer.println("}");
         writer.close();
@@ -51,17 +54,17 @@ public class GenerateAst {
 
             for(String type:types){
                 String typeName = type.split(":")[0].trim();
-                writer.println(" R visit" + typeName + baseName + "(" + 
+                writer.println("    R visit" + typeName + baseName + "(" + 
                 typeName + " " + baseName.toLowerCase() + ");");
             }
 
-            writer.println(("}"));
+            writer.println(("   }"));
     }
 
     private static void defineType(
         PrintWriter writer, String baseName,
         String className, String fieldList){
-            writer.println("  static class " + className + " extends " + baseName + "{");
+            writer.println("  static class " + className + " extends " + baseName + " {");
 
             // constructor
             writer.println("  "  + className + "(" + fieldList + ") {");
@@ -70,10 +73,16 @@ public class GenerateAst {
             String[] fields = fieldList.split(", ");
             for(String field: fields){
                 String name = field.split(" ")[1];
-                writer.println("  this." + name + " = " + name + ";");
+                writer.println("    this." + name + " = " + name + ";");
             }
 
             writer.println("   }");
+
+            writer.println();
+            writer.println("    @Override");
+            writer.println("    <R> R accept(Visitor<R> visitor) {");
+            writer.println("        return visitor.visit" + className + baseName + "(this);");
+            writer.println("    }");
 
             // fields
             writer.println();
@@ -82,5 +91,6 @@ public class GenerateAst {
             }
 
             writer.println("  }");
+
     }
 }
