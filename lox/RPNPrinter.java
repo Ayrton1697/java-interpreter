@@ -7,12 +7,13 @@ public class RPNPrinter implements Expr.Visitor<String>{
 
     @Override
     public String visitBinaryExpr(Expr.Binary expr){
-        return expr.left.accept(this) + " " + expr.right.accept(this) + " " + expr.operator.lexeme;
+        return expr.left.accept(this)+ " " + expr.right.accept(this) + " " + expr.operator.lexeme;
     }
     
     @Override
     public String visitGroupingExpr(Expr.Grouping expr){
-        return RPN("group",expr.expression);
+        // return RPN("group",expr.expression);
+        return expr.expression.accept(this);
     }
     
     @Override
@@ -23,7 +24,7 @@ public class RPNPrinter implements Expr.Visitor<String>{
 
     @Override
     public String visitUnaryExpr(Expr.Unary expr){
-        return expr.right + " " + expr.operator.lexeme;
+        return expr.right.accept(this) + " " + expr.operator.lexeme;
     }
 
     private String RPN(String name, Expr... exprs){
@@ -45,11 +46,12 @@ public class RPNPrinter implements Expr.Visitor<String>{
                 new Expr.Literal(123)),
 
             new Token(TokenType.STAR,"*", null,1),
+            
             new Expr.Grouping(
-                new Expr.Literal(45.67)
+                new Expr.Literal(45.68)
             )
             );
 
-            System.out.println(new AstPrinter().print(expression));
+            System.out.println(new RPNPrinter().print(expression));
     }
 }
