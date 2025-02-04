@@ -27,17 +27,6 @@ public class RPNPrinter implements Expr.Visitor<String>{
         return expr.right.accept(this) + " " + expr.operator.lexeme;
     }
 
-    private String RPN(String name, Expr... exprs){
-        StringBuilder builder = new StringBuilder();
-        builder.append("(").append(name);
-        for (Expr expr:exprs){
-            builder.append(" ");
-            builder.append(expr.accept(this));
-        }
-        builder.append(")");
-
-        return builder.toString();
-    }
 
     public static void main(String[] args){
         Expr expression = new Expr.Binary(
