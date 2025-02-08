@@ -5,7 +5,7 @@ import static lox.TokenType.*;
 
 class Parser {
     private final List<Token> tokens;
-    private int current = 0
+    private int current = 0;
 
     Parser(List<Token> tokens){
         this.tokens = tokens;
@@ -34,10 +34,16 @@ class Parser {
             }
             return false;
         }
+    }
 
+    
     private boolean check(TokenType type){
         if(isAtEnd()) return false;
         return peek().type == type;
     }
+
+    private Token advance(){
+        if(!isAtEnd()) current++;
+        return previous();
     }
 }
