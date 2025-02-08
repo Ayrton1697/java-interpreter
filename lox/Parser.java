@@ -12,7 +12,7 @@ class Parser {
     }
 
     private Expr expression(){
-        return equality;
+        return equality();
     }
 
     private Expr equality(){
@@ -50,7 +50,7 @@ class Parser {
 
     private Expr factor(){
         Expr expr = unary();
-        while(match(MINUS,PLUS)){
+        while(match(SLASH,STAR)){
             Token operator = previous();
             Expr right = unary();
             expr = new Expr.Binary(expr, operator, right);
@@ -59,14 +59,41 @@ class Parser {
         return expr;
     }
 
+    private Expr unary(){
+        if(match(BANG,MINUS)){
+            Token operator = previous();
+            Expr right = unary();
+            return new Expr.Unary(operator, right);
+        }
+
+        return primary();
+    }
+
+    private Expr primary(){
+        if(match(TRUE)) return new Expr.Literal(TRUE);
+        if(match(FALSE)) return new Expr.Literal(TRUE);
+        if(match(NIL)) return new Expr.Literal(NIL);
+        if(match(NUMBER,STRING)) {
+            return new Expr.Literal(previous().literal);
+        }
+
+        if(match(LEFT_PAREN)){
+            Expr expr = expression();
+            consume(RIGHT_PAREN,"Expect ')' after expression.");
+            return new Expr.Grouping(expr);
+        }
+
+        return primary();
+    }
+
     private boolean match(TokenType... types){
         for (TokenType type:types){
             if(check(type)){
                 advance();
-                return;
+                return true;
             }
-            return false;
         }
+            return false;
     }
 
     
