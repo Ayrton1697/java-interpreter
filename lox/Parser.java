@@ -34,6 +34,20 @@ class Parser {
         return comma();
     }
 
+    
+    private Expr ternary(){
+        // gramar rule es ternary -> expression "?" ternary ":" ternary | expression ;
+        //  let result = a == 2 ? 3 : 4
+        Expr expr = expression();
+        if(match(QUESTION)){
+            Expr exprThen = ternary();
+            consume(COLON, "Expect :");
+            Expr exprElse = ternary();
+            return new Expr.Ternary(expr, exprThen, exprElse);
+        }
+        return expr;
+    }
+
     // para agregar block statement support agregamos
     //  expression  → comma ;
     //  comma       → equality ( "," equality )* ;
