@@ -12,6 +12,14 @@ class Parser {
         this.tokens = tokens;
     }
 
+    // Expr parse(){
+    //     try {
+    //         return expression();
+    //     }   catch(ParseError error) {
+    //         return null;
+    //     }
+    // }
+
     Expr parse(){
         try {
             return expression();
@@ -20,8 +28,24 @@ class Parser {
         }
     }
 
+
     private Expr expression(){
-        return equality();
+        // return equality();
+        return comma();
+    }
+
+    // para agregar block statement support agregamos
+    //  expression  → comma ;
+    //  comma       → equality ( "," equality )* ;
+    // let result = (a+=2, b+=3)
+    private Expr comma(){
+        Expr expr = equality();
+        while(match(COMMA)){
+            Token operator = previous();
+            Expr right = equality();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+        return expr;
     }
 
     private Expr equality(){
