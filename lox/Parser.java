@@ -55,7 +55,11 @@ class Parser {
     private Expr comma(){
         Expr expr = equality();
         while(match(COMMA)){
-            Token operator = previous();
+            Token operator = previous(); //seria la coma que acabamos de consumir
+
+            // binary operator appearing without left hand operand ---> (   , 5+=2; )
+            if (expr == null) error(operator, "Binary operator without left-hand operand."); 
+
             Expr right = equality();
             expr = new Expr.Binary(expr, operator, right);
         }
@@ -66,6 +70,10 @@ class Parser {
         Expr expr = comparison();
         while(match(BANG_EQUAL, EQUAL_EQUAL)){
             Token operator = previous();
+
+            // binary operator appearing without left hand operand ----> ( == 2; )
+            if (expr == null) error(operator, "Binary operator without left-hand operand."); 
+
             Expr right = comparison();
             expr = new Expr.Binary(expr, operator, right);
         }
@@ -76,7 +84,12 @@ class Parser {
     private Expr comparison(){
         Expr expr = term();
         while(match(GREATER,GREATER_EQUAL,LESS,LESS_EQUAL)){
+            
             Token operator = previous();
+
+            // binary operator appearing without left hand operand ---> ( >= 2;)
+            if (expr == null) error(operator, "Binary operator without left-hand operand."); 
+            
             Expr right = term();
             expr = new Expr.Binary(expr, operator, right);
         }
@@ -88,6 +101,10 @@ class Parser {
         Expr expr = factor();
         while(match(MINUS,PLUS)){
             Token operator = previous();
+
+            // binary operator appearing without left hand operand ---> ( + 1;)
+            if (expr == null) error(operator, "Binary operator without left-hand operand."); 
+
             Expr right = factor();
             expr = new Expr.Binary(expr, operator, right);
         }
@@ -99,6 +116,10 @@ class Parser {
         Expr expr = unary();
         while(match(SLASH,STAR)){
             Token operator = previous();
+
+            // binary operator appearing without left hand operand --> (  * 2; )
+            if (expr == null) error(operator, "Binary operator without left-hand operand."); 
+
             Expr right = unary();
             expr = new Expr.Binary(expr, operator, right);
         }
