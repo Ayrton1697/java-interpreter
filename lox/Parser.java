@@ -57,8 +57,12 @@ class Parser {
         while(match(COMMA)){
             Token operator = previous(); //seria la coma que acabamos de consumir
 
+            // inciso 3.'a'
             // binary operator appearing without left hand operand ---> (   , 5+=2; )
-            if (expr == null) error(operator, "Binary operator without left-hand operand."); 
+            // if (expr == null) error(operator, "Binary operator without left-hand operand."); 
+
+            // Con esto descartamos y seguimos (inciso 3.'b'), ya que solo reportamos el error, en vez de raisear una exception
+            if (expr == null) Lox.error(operator, "Binary operator without left-hand operand.");
 
             Expr right = equality();
             expr = new Expr.Binary(expr, operator, right);
@@ -71,8 +75,12 @@ class Parser {
         while(match(BANG_EQUAL, EQUAL_EQUAL)){
             Token operator = previous();
 
+            // inciso 3.'a'
             // binary operator appearing without left hand operand ----> ( == 2; )
-            if (expr == null) error(operator, "Binary operator without left-hand operand."); 
+            // if (expr == null) error(operator, "Binary operator without left-hand operand."); 
+
+            // (inciso 3.'b') Con esto descartamos y seguimos, ya que solo reportamos el error, en vez de raisear una exception
+            if (expr == null) Lox.error(operator, "Binary operator without left-hand operand.");
 
             Expr right = comparison();
             expr = new Expr.Binary(expr, operator, right);
@@ -87,8 +95,12 @@ class Parser {
             
             Token operator = previous();
 
+            // inciso 3.'a'
             // binary operator appearing without left hand operand ---> ( >= 2;)
-            if (expr == null) error(operator, "Binary operator without left-hand operand."); 
+            // if (expr == null) error(operator, "Binary operator without left-hand operand."); 
+
+            // (inciso 3.'b') Con esto descartamos y seguimos, ya que solo reportamos el error, en vez de raisear una exception
+            if (expr == null) Lox.error(operator, "Binary operator without left-hand operand.");
             
             Expr right = term();
             expr = new Expr.Binary(expr, operator, right);
@@ -102,8 +114,12 @@ class Parser {
         while(match(MINUS,PLUS)){
             Token operator = previous();
 
+            // inciso 3.'a'
             // binary operator appearing without left hand operand ---> ( + 1;)
-            if (expr == null) error(operator, "Binary operator without left-hand operand."); 
+            // if (expr == null) error(operator, "Binary operator without left-hand operand."); 
+
+            // (inciso 3.'b') Con esto descartamos y seguimos, ya que solo reportamos el error, en vez de raisear una exception
+            if (expr == null) Lox.error(operator, "Binary operator without left-hand operand.");
 
             Expr right = factor();
             expr = new Expr.Binary(expr, operator, right);
@@ -117,8 +133,12 @@ class Parser {
         while(match(SLASH,STAR)){
             Token operator = previous();
 
+            // inciso 3.'a'
             // binary operator appearing without left hand operand --> (  * 2; )
-            if (expr == null) error(operator, "Binary operator without left-hand operand."); 
+            // if (expr == null) error(operator, "Binary operator without left-hand operand."); 
+
+            // (inciso 3.'b') Con esto descartamos y seguimos, ya que solo reportamos el error, en vez de raisear una exception
+            if (expr == null) Lox.error(operator, "Binary operator without left-hand operand.");
 
             Expr right = unary();
             expr = new Expr.Binary(expr, operator, right);
