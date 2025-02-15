@@ -20,6 +20,13 @@ class Interpreter implements Expr.Visitor<Object> {
         return null;
     }
 
+
+    private boolean isTruthy(Object object){
+        if(object == null) return false;
+        if (object instanceof Boolean) return (boolean)object;
+        return true;
+    }
+
     @Override
     public Object visitGroupingExpr(Expr.Grouping expr){
         return evaluate(expr.expression);
