@@ -1,6 +1,6 @@
 package lox;
 
-class Interpreter implements Expr.Visitor<Object> {
+public class Interpreter implements Expr.Visitor<Object> {
 
     
     // Se manda recursivamente la expresion hacia el metodo correspondiente
@@ -8,7 +8,19 @@ class Interpreter implements Expr.Visitor<Object> {
         return expr.accept(this);
     }
 
+    void interpret(Expr expression){
+        try{
+            Object value = evaluate(expression);
+
+        }
+    }
+
     
+    @Override
+    public Object visitTernaryExpr(Expr.Ternary expr){
+        Object test = "";
+        return test; 
+    }
 
     @Override 
     public Object visitBinaryExpr(Expr.Binary expr){
@@ -16,21 +28,21 @@ class Interpreter implements Expr.Visitor<Object> {
         Object right = evaluate(expr.right);
         switch(expr.operator.type){
             case GREATER:
-                checkNumberOperand(expr.operator,left,right);
+                checkNumberOperands(expr.operator,left,right);
                 return (double)left > (double)right;
             case GREATER_EQUAL:
-                checkNumberOperand(expr.operator,left,right);
+                checkNumberOperands(expr.operator,left,right);
                 return (double)left >= (double)right;
             case LESS:
-                checkNumberOperand(expr.operator,left,right);
+                checkNumberOperands(expr.operator,left,right);
                 return (double)left < (double)right;
             case LESS_EQUAL:
-                checkNumberOperand(expr.operator,left,right);
+                checkNumberOperands(expr.operator,left,right);
                 return (double)left <= (double)right;
             case BANG_EQUAL: return !isEqual(left,right);
             case EQUAL_EQUAL: return isEqual(left,right);
             case MINUS:
-                checkNumberOperand(expr.operator,left,right);
+                checkNumberOperands(expr.operator,left,right);
                 return (double)left - (double)right;
             case PLUS:
                 if(left instanceof Double && right instanceof Double){
@@ -39,12 +51,12 @@ class Interpreter implements Expr.Visitor<Object> {
                 if (left instanceof String && right instanceof String){
                     return (String)left + (String)right;
                 }
-                break;
+                throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
             case SLASH:
-                checkNumberOperand(expr.operator,left,right);
+                checkNumberOperands(expr.operator,left,right);
                 return (double)left / (double)right;
             case STAR:
-                checkNumberOperand(expr.operator,left,right);
+                checkNumberOperands(expr.operator,left,right);
                 return (double)left * (double)right;
         }
 
@@ -62,7 +74,7 @@ class Interpreter implements Expr.Visitor<Object> {
         return expr.value;
     }
 
-    @Overide
+    @Override
     public Object visitUnaryExpr(Expr.Unary expr){
         Object right = evaluate(expr.right);
         switch(expr.operator.type){
@@ -81,8 +93,8 @@ class Interpreter implements Expr.Visitor<Object> {
         throw new RuntimeError(operator, "Operand must be a number.");
     }
 
-    private void checkNumberOperandS(Token operator, Object left, Object right){
-        if (left instanceof of Double && right instanceof Double) return;
+    private void checkNumberOperands(Token operator, Object left, Object right){
+        if (left instanceof Double && right instanceof Double) return;
         throw new RuntimeError(operator, "Operands must be numbers.");
     }
 
