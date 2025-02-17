@@ -16,16 +16,21 @@ class Interpreter implements Expr.Visitor<Object> {
         Object right = evaluate(expr.right);
         switch(expr.operator.type){
             case GREATER:
+                checkNumberOperand(expr.operator,left,right);
                 return (double)left > (double)right;
             case GREATER_EQUAL:
+                checkNumberOperand(expr.operator,left,right);
                 return (double)left >= (double)right;
             case LESS:
+                checkNumberOperand(expr.operator,left,right);
                 return (double)left < (double)right;
             case LESS_EQUAL:
+                checkNumberOperand(expr.operator,left,right);
                 return (double)left <= (double)right;
             case BANG_EQUAL: return !isEqual(left,right);
             case EQUAL_EQUAL: return isEqual(left,right);
             case MINUS:
+                checkNumberOperand(expr.operator,left,right);
                 return (double)left - (double)right;
             case PLUS:
                 if(left instanceof Double && right instanceof Double){
@@ -36,8 +41,10 @@ class Interpreter implements Expr.Visitor<Object> {
                 }
                 break;
             case SLASH:
+                checkNumberOperand(expr.operator,left,right);
                 return (double)left / (double)right;
             case STAR:
+                checkNumberOperand(expr.operator,left,right);
                 return (double)left * (double)right;
         }
 
