@@ -58,6 +58,7 @@ public class Interpreter implements Expr.Visitor<Object> {
                 }
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
             case SLASH:
+            if((double)right == 0.0) throw new RuntimeError(expr.operator, "Division by zero is not allowed.");
                 checkNumberOperands(expr.operator,left,right);
                 return (double)left / (double)right;
             case STAR:
