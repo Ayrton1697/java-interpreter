@@ -2,6 +2,8 @@ package lox;
 
 import java.util.List;
 
+import lox.Stmt.Block;
+
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private Environment environment = new Environment();
@@ -13,6 +15,25 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private void execute(Stmt stmt){
         stmt.accept(this);
+    }
+
+    void executeBlock(List<Stmt> statements, Environment environment){
+        Environment previous = this.environment;
+        try{
+            this.environment = environment;
+
+            for(Stmt statement:statements){
+                execute(statement);
+            }
+        } finally{
+            this.environment = previous;
+        }
+    }
+
+    @Override
+    public Void visitBlockStmt(Stmt.Block stmt) {
+        executeBlock(stmt.statements, new Environment(environment));
+        return null;
     }
 
     @Override
