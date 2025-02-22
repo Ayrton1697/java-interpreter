@@ -24,6 +24,8 @@ public class Environment {
             return values.get(name.lexeme);
         }
 
+        if(enclosing != null) return enclosing.get(name); //recursivamente, ya que llama a este mismo metodo get del otro environment
+
         throw new RuntimeError(name,"Undefined variable ' " + name.lexeme + " '.");
     }
 
@@ -32,6 +34,12 @@ public class Environment {
             values.put(name.lexeme,value);
             return;
         }
+
+        if(enclosing != null){
+            enclosing.assign(name,value); //recursivamente, ya que llama a este mismo metodo assign del otro environment
+            return;
+        }
+
         throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
     }
 }
