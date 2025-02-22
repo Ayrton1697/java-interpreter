@@ -64,6 +64,10 @@ public class Lox {
 
     // System.out.println(new AstPrinter().print(expression));
     interpreter.interpret(statements);
+
+
+    // CHALLENGE 1 PAG 133, si corremos una expresion como un statment va a fallar, entonces la corremos como una expresion
+
   }
 
 

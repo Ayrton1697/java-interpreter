@@ -308,6 +308,16 @@ class Parser {
             advance();
         }
     }
+
+
+    // CHALLENGE 1 PAG 133
+    // public Expr parseExpression() {
+    //     try {
+    //         return expression(); // Leverage the private expression() method
+    //     } catch (ParseError error) {
+    //         return null; // Return null on error (e.g., invalid expression)
+    //     }
+    // }
     
 
 }

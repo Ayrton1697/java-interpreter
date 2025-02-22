@@ -9,6 +9,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     private Environment environment = new Environment();
     
     // Se manda recursivamente la expresion hacia el metodo correspondiente
+    
     private Object evaluate(Expr expr){
         return expr.accept(this);
     }
@@ -38,7 +39,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitExpressionStmt(Stmt.Expression stmt){
-        evaluate(stmt.expression);
+        evaluate(stmt.expression);  
+        
+        // ESTO PARA EL CHALLENGE 1 DE LA PAG 133
+        // Object value = evaluate(stmt.expression);
+        // System.out.println(stringify(value));
         return null;
     }
 
