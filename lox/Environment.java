@@ -7,6 +7,9 @@ public class Environment {
     final Environment enclosing;
     private final Map<String, Object> values = new HashMap<>();
     
+    // CHALLENGE 2 PAG 133
+    static final Object UNINITIALIZED = new Object();
+
     Environment(){
         enclosing = null;
     }
@@ -16,6 +19,9 @@ public class Environment {
     }
     
     void define(String name, Object value){
+        // CHALLENGE 2 PAG 133
+        // values.put(name, value == null ? UNINITIALIZED : value);
+        
         values.put(name,value);
     }
 

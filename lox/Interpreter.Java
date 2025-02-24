@@ -161,6 +161,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitVariableExpr(Expr.Variable expr){
+        // challenge 2 pag 133 ESTO NO FUNCIONA PORQUE TAMBIEN VA A TIRAR ERROR EN VARIABLES QUE LES HAYAMOS ASIGNADO EL VALOR NULL A PROPOSITO
+        // Object variable = environment.get(expr.name);
+        // if(variable == null) throw new RuntimeError(expr.name, "Has not been initialized.");
+
+        // Object value = environment.get(expr.name);
+        // if (value == Environment.UNINITIALIZED) {
+        //     throw new RuntimeError(expr.name, "Variable '" + expr.name.lexeme + "' has not been initialized.");
+        // }
+        // return value;
+
         return environment.get(expr.name);
     }
 
