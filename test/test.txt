@@ -10,3 +10,4 @@ print "a has value " + a;
     var a = a + 2;
     print a;
 }
+print a;
