@@ -83,11 +83,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     
-    @Override
-    public Object visitTernaryExpr(Expr.Ternary expr){
-        Object test = "";
-        return test; 
-    }
+    // @Override
+    // public Object visitTernaryExpr(Expr.Ternary expr){
+    //     Object test = "";
+    //     return test; 
+    // }
 
     @Override 
     public Object visitBinaryExpr(Expr.Binary expr){
