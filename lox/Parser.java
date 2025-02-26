@@ -81,6 +81,19 @@ class Parser {
         consume(RIGHT_PAREN, "Expect ')' after for clauses.");
         
         Stmt body = statement();
+
+        if(increment != null){
+            body = new Stmt.Block(Arrays.asList(body, new Stmt.Expression(increment)));
+        }
+
+        if(condition == null) condition = new Expr.Literal(TRUE);
+
+        // usamos el while por atras, como ya lo teniamos hecho...
+        body = new Stmt.While(condition, body);
+
+        if(initializer != null){
+            body = new Stmt.Block(Arrays.asList(initializer, body));
+        }
         
         return body;
     }
