@@ -7,6 +7,13 @@ import lox.Stmt.Block;
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private Environment environment = new Environment();
+
+    // Exception for break
+    private static class BreakException extends RuntimeException {
+        BreakException() {
+            super(null, null, false, false); // Suppress stack trace
+        }
+    }
     
     // Se manda recursivamente la expresion hacia el metodo correspondiente
     
@@ -84,6 +91,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visitBreakStmt(Stmt.Break stmt){
+        throw new BreakException();   
+    }
+
 
     @Override
     public Object visitAssignExpr(Expr.Assign expr){
@@ -92,6 +104,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return value;
     }
 
+
+
     void interpret(List<Stmt> statements){
         try{
             for (Stmt statement : statements){
@@ -99,6 +113,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             }
         } catch(RuntimeError error){
             Lox.runtimeError(error);
+        } catch(BreakException e){
+            Lox.runtimeError(new RuntimeError(null,"Misplaced break statement"));
         }
     }
 

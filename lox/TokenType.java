@@ -19,5 +19,8 @@ enum TokenType{
     EOF,
 
     // ternary
-    QUESTION, COLON
+    QUESTION, COLON,
+
+    // break stmt
+    BREAK
 }

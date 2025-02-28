@@ -49,6 +49,7 @@ class Parser {
     }
 
     private Stmt statement(){
+        if(match(BREAK)) return breakStatement();
         if(match(FOR)) return forStatement();
         if(match(IF)) return ifStatement();
         if(match(PRINT)) return printStatement();
@@ -96,6 +97,11 @@ class Parser {
         }
         
         return body;
+    }
+
+    private Stmt breakStatement(){
+        consume(SEMICOLON, "Expected ';' after break statement.");
+        return new Stmt.Break("");
     }
 
     private Stmt ifStatement(){
