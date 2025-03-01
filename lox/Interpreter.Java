@@ -182,6 +182,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 if ( (left instanceof String && right instanceof Double) || (left instanceof Double && right instanceof String) ){
                     return left.toString() + right.toString();
                 }
+                // System.out.println(left.getClass());
+                // System.out.println(right.getClass());
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
             case SLASH:
             if((double)right == 0.0) throw new RuntimeError(expr.operator, "Division by zero is not allowed.");
@@ -201,7 +203,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object callee = evaluate(expr.callee);
         List<Object> arguments = new ArrayList<>(); 
         for (Expr argument : expr.arguments){
-            arguments.add(argument);
+            arguments.add(evaluate(argument));
         }
 
         if(!(callee instanceof LoxCallable)){

@@ -11,3 +11,9 @@ print "a has value " + a;
     print a;
 }
 print a;
+
+fun sayHi(first,last){
+    print "Hi, " + first + " " + last;
+}
+
+sayHi("Dear","Reader");
