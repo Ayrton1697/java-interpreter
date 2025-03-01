@@ -165,7 +165,10 @@ class Parser {
                 
             }  while (match(COMMA));
         }
-        consume(RIGHT_PAREN, "Expect '(' after parameters.");
+        consume(RIGHT_PAREN, "Expect ')' after parameters.");
+        consume(LEFT_BRACE, "Expect '{' before" + kind + " body.");
+        List<Stmt> body = block();
+        return new Stmt.Function(name, parameters, body);
     }
 
     private List<Stmt> block(){
