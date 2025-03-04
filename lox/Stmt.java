@@ -7,6 +7,7 @@ abstract class Stmt {
     R visitBlockStmt(Block stmt);
     R visitExpressionStmt(Expression stmt);
     R visitFunctionStmt(Function stmt);
+    R visitAnonymousFunctionStmt(AnonymousFunction stmt);
     R visitIfStmt(If stmt);
     R visitPrintStmt(Print stmt);
     R visitReturnStmt(Return stmt);
@@ -51,6 +52,20 @@ abstract class Stmt {
     }
 
    final Token name;
+   final List<Token> params;
+   final List<Stmt> body;
+  }
+  static class AnonymousFunction extends Stmt {
+  AnonymousFunction(List<Token> params, List<Stmt> body) {
+    this.params = params;
+    this.body = body;
+   }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+        return visitor.visitAnonymousFunctionStmt(this);
+    }
+
    final List<Token> params;
    final List<Stmt> body;
   }
