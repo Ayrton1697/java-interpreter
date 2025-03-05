@@ -75,10 +75,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitFunctionStmt(Stmt.Function stmt){
-        LoxFunction function = new LoxFunction(stmt, environment);
+        LoxFunction function = new LoxFunction(stmt,null, environment,true);
         environment.define(stmt.name.lexeme, function);
         return null;
     }
+
 
     @Override
     public Void visitIfStmt(Stmt.If stmt){
@@ -274,6 +275,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         return environment.get(expr.name);
     }
+
+
+    @Override
+    public Object visitFunctionExpr(Expr.Function expr){
+        return new LoxFunction(null, expr, null,false);
+    }
+
 
     private void checkNumberOperand(Token operator, Object operand){
         if (operand instanceof Double ) return;
