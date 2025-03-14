@@ -30,6 +30,7 @@ class Parser {
 
         return statements;
     }
+    
 
 
     private Expr expression(){
@@ -40,7 +41,7 @@ class Parser {
 
     private Stmt declaration(){
         try{
-            if(match(FUN)) return function("function");
+            if(match(FUN) && peek().type == IDENTIFIER) return function("function");
             if(match(VAR)) return varDeclaration();
             return statement();
         }catch (ParseError error){
