@@ -62,6 +62,16 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         stmt.accept(this);
     }
 
+    private void resolveFunction(Stmt.Function function){
+        beginScope();
+        for(Token param:function.params){
+            declare(param);
+            define(param);
+        }
+        resolve(function.body);
+        endScope();
+    }
+
     private void resolve(Expr expr){
         expr.accept(this);
     }
