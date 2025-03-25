@@ -43,6 +43,20 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         return null;
     }
 
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt){
+        resolve(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitReturnStmt(Stmt.Return stmt){
+        if(stmt.value != null){
+            resolve(stmt.value);
+        }
+        return null;
+    }
+
     @Override 
     public Void visitVarStmt(Stmt.Var stmt){
         declare(stmt.name);
@@ -50,6 +64,13 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
             resolve(stmt.initializer);
         }
         define(stmt.name);
+        return null;
+    }
+
+    @Override
+    public Void visitWhileStmt(Stmt.While stmt){
+        resolve(stmt.condition);
+        resolve(stmt.body);
         return null;
     }
 
