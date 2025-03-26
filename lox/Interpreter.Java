@@ -2,6 +2,7 @@ package lox;
 
 import java.util.List;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.ArrayList;
 
 import lox.Stmt.Block;
@@ -279,7 +280,17 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         // }
         // return value;
 
-        return environment.get(expr.name);
+        // return environment.get(expr.name);
+        return lookUpVariable(expr.name,expr);
+    }
+
+    private Object lookUpVariable(Token name, Expr expr){
+        Integer distance = locals.get(expr);
+        if(distance != null){
+            return environment.getAt(distance, name.lexeme);
+        } else{
+            return globals.get(name);
+        }
     }
 
 
