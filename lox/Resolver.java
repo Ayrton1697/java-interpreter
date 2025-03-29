@@ -8,6 +8,12 @@ import java.util.Stack;
 class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     private final Interpreter interpreter;
     private final Stack<Map<String,Boolean>> scopes = new Stack();
+    
+    // para trackear si una variable se uso agregamos una propiedad
+    // private final Stack<Map<String,Map<String,Boolean>>> scopesTwo= new Stack();
+    // La idea es que se lea -> "variable a" -> "{defined:true, used:false}" 
+    // Habria que cambiar como se crea la variable en el map y dsp cambiar el used a true cuando se resuelve esa variable
+    
     private FunctionType currentFunction = FunctionType.NONE;
 
     Resolver(Interpreter interpreter){
@@ -139,6 +145,12 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
             "Cant read local variable in its own initializer.");
         }
 
+        // challenge 3 pag 191
+        // cuando usamos una variable, caemos a esta funcion. hay que llevar un registro y dsp
+        // hacer la diferencia entre todas las declaradas y todas las usadas y reportar si alguna no se uso
+        // en realidad hay que hacerlo adentro de resolveLocal porque aca entras cuando usas una variable, independientemente de si existia o no
+        // para que quede mas seguro hagamoslo en resolveLocal
+        
         resolveLocal(expr,expr.name);
         return null;
     }
