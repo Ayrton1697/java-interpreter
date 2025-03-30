@@ -208,6 +208,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
     private void resolveLocal(Expr expr, Token name){
         for(int i = scopes.size() - 1; i>=0; i--){
+            // aca buscamos el scope donde esta la variable, para el challenge 4 pag 191 ternemos que buscar tambien el index que tenemos q haber agregado antes
             if(scopes.get(i).containsKey(name.lexeme)){
                 interpreter.resolve(expr, scopes.size() - 1 -i);
                 return;
