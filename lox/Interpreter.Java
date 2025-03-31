@@ -49,6 +49,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     void resolve(Expr expr, int depth){
         locals.put(expr, depth);
+        // challenge 4 pag 191
+        // hay que cambiar locals por un array y solo insertar las variables cada una en su index que pasamos
     }
 
     void executeBlock(List<Stmt> statements, Environment environment){
@@ -294,6 +296,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private Object lookUpVariable(Token name, Expr expr){
         Integer distance = locals.get(expr);
+         // challenge 4 pag 191
+        // hay que buscar la variable por su index en vez de por el nombre
+        // osea, aca la obtenemos por nombre y traemos distance e index y lo pasamos a environment getAt
         if(distance != null){
             return environment.getAt(distance, name.lexeme);
         } else{

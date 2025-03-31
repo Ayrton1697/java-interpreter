@@ -34,6 +34,8 @@ public class Environment {
     }
 
     Object getAt(int distance, String name){
+        // challenge 4 pag 191
+        //  hay que obtenerla por index en vez de name aca
         return ancestor(distance).values.get(name);
     }
 
