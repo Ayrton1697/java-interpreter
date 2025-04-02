@@ -41,6 +41,7 @@ class Parser {
 
     private Stmt declaration(){
         try{
+            if(match(CLASS)) return classDeclaration();
             if(match(FUN) && peek().type == IDENTIFIER) return function("function");
             if(match(VAR)) return varDeclaration();
             return statement();
@@ -49,6 +50,18 @@ class Parser {
             return null;
         }
     }
+
+    private Stmt classDeclaration(){
+        Token name = consume(IDENTIFIER, "Expect class name.");
+        consume(LEFT_BRACE, "Expect '{' before class body.");
+        List<Stmt.Function> methods = new ArrayList<>();
+        while(!check(RIGTH_BRACE) && !isAtEnd()){
+            methods.add(function("method"));
+        }
+
+        consume(RIGTH_BRACE, "Expect '}' after class body.");
+        return new Stmt.Class(name, methods);
+    } 
 
     private Stmt statement(){
         if(match(BREAK)) return breakStatement();
