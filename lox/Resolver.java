@@ -5,15 +5,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import lox.Interpreter;
+
 class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     private final Interpreter interpreter;
-    private final Stack<Map<String,Boolean>> scopes = new Stack();
+    // private final Stack<Map<String,Boolean>> scopes = new Stack();
+    private final Stack<Map<String,Object[]>> scopes = new Stack();
     
     // para trackear si una variable se uso agregamos una propiedad
     // private final Stack<Map<String,Map<String,Boolean>>> scopesTwo= new Stack();
     // La idea es que se lea -> "variable a" -> "{defined:true, used:false}" 
     // Habria que cambiar como se crea la variable en el map y dsp cambiar el used a true cuando se resuelve esa variable
     
+
+    // el resolver basicamente devuelve { VarExpr("a") -> 1}, si es que la variable "a" se encuentra a 1 scope de distancia. Esta info se la pasa
+    // al interpreter en resolveLocal, y el interpreter terminando poniendo en su "locals" esto locals = {
+    //     [Expr.Variable(a)] -> 1
+    //   }
+
     private FunctionType currentFunction = FunctionType.NONE;
 
     Resolver(Interpreter interpreter){
@@ -25,6 +34,10 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         FUNCTION
     }
 
+    @Override 
+    public Void visitFunctionExpr(Expr.Function expr){
+        return null;
+    }
     @Override 
     public Void visitBlockStmt(Stmt.Block stmt){
         beginScope();
@@ -137,21 +150,24 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         return null;
     }
 
-    @Override 
-    public Void visitVariableExpr(Expr.Variable expr){
-        if(!scopes.isEmpty() &&
-        scopes.peek().get(expr.name.lexeme) == Boolean.FALSE){
-            Lox.error(expr.name,
-            "Cant read local variable in its own initializer.");
-        }
+    @Override
+    public Void visitBreakStmt(Stmt.Break stmt) {
+        // No variables to resolve in a break statement, so just return null
+        return null;
+    }
 
-        // challenge 3 pag 191
-        // cuando usamos una variable, caemos a esta funcion. hay que llevar un registro y dsp
-        // hacer la diferencia entre todas las declaradas y todas las usadas y reportar si alguna no se uso
-        // en realidad hay que hacerlo adentro de resolveLocal porque aca entras cuando usas una variable, independientemente de si existia o no
-        // para que quede mas seguro hagamoslo en resolveLocal
+    @Override 
+    public Void visitVariableExpr(Expr.Variable expr) {
+        if (!scopes.isEmpty()) {
+            Map<String, Object[]> scope = scopes.peek();
+            Object[] metadata = scope.get(expr.name.lexeme);
+            
+            if (metadata != null && (boolean)metadata[0] == false) {
+                Lox.error(expr.name, "Can't read local variable in its own initializer.");
+            }
+        }
         
-        resolveLocal(expr,expr.name);
+        resolveLocal(expr, expr.name);
         return null;
     }
 
@@ -184,7 +200,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     }
 
     private void beginScope(){
-        scopes.push(new HashMap<String,Boolean>());
+        scopes.push(new HashMap<String,Object[]>());
     }
 
     private void endScope(){
@@ -193,24 +209,28 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
     private void declare(Token name){
         if (scopes.isEmpty()) return;
-        Map<String, Boolean> scope = scopes.peek();
+        Map<String, Object[]> scope = scopes.peek();
         if(scope.containsKey(name.lexeme)){
             Lox.error(name,
             "Already a variable with this name in this scope.");
         }
-        scope.put(name.lexeme, false);
+        // scope.put(name.lexeme, false);
+        // asignar un index a la variable
+        scope.put(name.lexeme, new Object[] {false, scope.size()} );
     }
 
     private void define(Token name){
         if (scopes.isEmpty()) return;
-        scopes.peek().put(name.lexeme,true);
+        // scopes.peek().put(name.lexeme,true);
+        scopes.peek().get(name.lexeme)[0] = true;
     }
 
     private void resolveLocal(Expr expr, Token name){
         for(int i = scopes.size() - 1; i>=0; i--){
             // aca buscamos el scope donde esta la variable, para el challenge 4 pag 191 ternemos que buscar tambien el index que tenemos q haber agregado antes
             if(scopes.get(i).containsKey(name.lexeme)){
-                interpreter.resolve(expr, scopes.size() - 1 -i);
+                int index = (int)scopes.get(i).get(name.lexeme)[1];
+                interpreter.resolve(expr, scopes.size() - 1 -i, index);
                 return;
             }
         }

@@ -6,13 +6,26 @@ import java.util.Map;
 import java.util.ArrayList;
 
 import lox.Stmt.Block;
+import lox.Stmt.Var;
+
+
+class VariableLocation {
+    final int depth;
+    final int index;
+
+    VariableLocation(int depth, int index){
+        this.depth = depth;
+        this.index = index;
+    }
+}
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 
     final Environment globals = new Environment();
     private Environment environment = globals;
-    private final Map<Expr, Integer> locals = new HashMap<>();
+    // private final Map<Expr, Integer> locals = new HashMap<>();
+    private final Map<Expr, VariableLocation> locals = new HashMap<>();
 
     Interpreter(){
         globals.define("clock", new LoxCallable() {
@@ -47,8 +60,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         stmt.accept(this);
     }
 
-    void resolve(Expr expr, int depth){
-        locals.put(expr, depth);
+    void resolve(Expr expr, int depth, int index){
+        locals.put(expr,new VariableLocation(depth,index));
         // challenge 4 pag 191
         // hay que cambiar locals por un array y solo insertar las variables cada una en su index que pasamos
     }
@@ -143,9 +156,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object value = evaluate(expr.value);
         
         // environment.assign(expr.name,value);
-        Integer distance = locals.get(expr);
-        if(distance != null){
-            environment.assignAt(distance, expr.name, value);
+        // Integer distance = locals.get(expr);
+        VariableLocation location = locals.get(expr);
+        if(location != null){
+            // environment.assignAt(distance, expr.name, value);
+            environment.assignAt(location.depth, location.index, value);
         } else {
             globals.assign(expr.name, value);
         }
@@ -295,12 +310,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     private Object lookUpVariable(Token name, Expr expr){
-        Integer distance = locals.get(expr);
+        // Integer distance = locals.get(expr);
+        VariableLocation location = locals.get(expr);
          // challenge 4 pag 191
         // hay que buscar la variable por su index en vez de por el nombre
         // osea, aca la obtenemos por nombre y traemos distance e index y lo pasamos a environment getAt
-        if(distance != null){
-            return environment.getAt(distance, name.lexeme);
+        if(location != null){
+            // return environment.getAt(distance, name.lexeme);
+            return environment.getAt(location.depth, location.index);
         } else{
             return globals.get(name);
         }

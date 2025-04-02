@@ -1,11 +1,17 @@
 package lox;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Environment {
     final Environment enclosing;
-    private final Map<String, Object> values = new HashMap<>();
+
+    // cambiamos esto, ahora indices es un map con cada variable como key y el index como la posicion ( {"a":0, "b":1} )
+    private final Map<String, Integer> indices = new HashMap<>();
+    // creamos esto, values es una lista con el valor de cada variable ( ["hola","chau"] ) --> entonces a seria "hola" y b seria "chau"
+    private final List<Object> values = new ArrayList<>();
     
     // CHALLENGE 2 PAG 133
     static final Object UNINITIALIZED = new Object();
@@ -21,8 +27,17 @@ public class Environment {
     void define(String name, Object value){
         // CHALLENGE 2 PAG 133
         // values.put(name, value == null ? UNINITIALIZED : value);
-        
-        values.put(name,value);
+
+        // If the variable already exists, just update its value
+        Integer index = indices.get(name);
+        if(index != null){
+            values.set(index,value);
+        }else{
+            // Otherwise, create a new variable with next index
+            indices.put(name, values.size());
+            values.add(value);
+        }
+        // values.put(name,value);
     }
 
     Environment ancestor(int distance){
@@ -33,19 +48,23 @@ public class Environment {
         return environment;
     }
 
-    Object getAt(int distance, String name){
+    Object getAt(int distance, int index){
         // challenge 4 pag 191
         //  hay que obtenerla por index en vez de name aca
-        return ancestor(distance).values.get(name);
+        // return ancestor(distance).values.get(name);
+        return ancestor(distance).values.get(index);
     }
 
-    void assignAt(int distance, Token name, Object value){
-        ancestor(distance).values.put(name.lexeme, value);
+    void assignAt(int distance, int index, Object value){
+        // ancestor(distance).values.put(name.lexeme, value);
+        ancestor(distance).values.set(index, value);
     }
 
     Object get(Token name){
-        if(values.containsKey(name.lexeme)){
-            return values.get(name.lexeme);
+        if(indices.containsKey(name.lexeme)){
+            int index = indices.get(name.lexeme);
+            // return values.get(name.lexeme);
+            return values.get(index);
         }
 
         if(enclosing != null) return enclosing.get(name); //recursivamente, ya que llama a este mismo metodo get del otro environment
@@ -54,8 +73,11 @@ public class Environment {
     }
 
     void assign(Token name,Object value){
-        if(values.containsKey(name.lexeme)){
-            values.put(name.lexeme,value);
+        if(indices.containsKey(name.lexeme)){
+            int index = indices.get(name.lexeme);
+            values.set(index, value);
+            // values.put(name.lexeme,value);
+            
             return;
         }
 

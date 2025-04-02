@@ -7,7 +7,7 @@ print 2 / 1;
 var a = 1;
 print "a has value " + a;
 {
-    var a = a + 2;
+    var a = 2 + 2;
     print a;
 }
 print a;
@@ -31,4 +31,3 @@ thrice(fun(a){
     print a + 1;
 });
 
-fun() {};
