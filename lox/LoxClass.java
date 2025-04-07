@@ -18,6 +18,12 @@ public class LoxClass implements LoxCallable {
     @Override
     public Object call(Interpreter interpreter,
                     List<Object> arguments){
-        
+        LoxInstance instance = new LoxInstance(this);
+        return instance;
+    }
+
+    @Override
+    public int arity(){
+        return 0;
     }
 }
