@@ -6,8 +6,18 @@ import jata.util.Map;
 public class LoxClass implements LoxCallable {
     final String name;
 
-    LoxClass(String name){
+    private final java.util.Map<String, LoxFunction> methods;
+
+    LoxClass(String name, Map<String, LoxFunction> methods){
         this.name = name;
+        this.methods = methods;
+    }
+
+    LoxFunction findMethod(String name){
+        if(methods.containsKey(name)){
+            return methods.get(name);
+        }
+        return null;
     }
 
     @Override
