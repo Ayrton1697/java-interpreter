@@ -14,17 +14,23 @@ public class LoxFunction implements LoxCallable{
     //     this.declaration = declaration;
     // }
 
-    LoxFunction(Stmt.Function declaration, Expr.Function expression, Environment closure, boolean isInitializer) {
-        this.declaration = declaration;
-        this.expression = expression;
-        this.closure = closure;
-        this.isInitializer = isInitializer;
+    LoxFunction(Stmt.Function declaration, Environment closure, boolean isInitializer) {
+    this.declaration = declaration;
+    this.closure = closure;
+    this.isInitializer = isInitializer;
     }
+
+    // LoxFunction(Stmt.Function declaration, Expr.Function expression, Environment closure, boolean isInitializer) {
+    //     this.declaration = declaration;
+    //     this.expression = expression;
+    //     this.closure = closure;
+    //     this.isInitializer = isInitializer;
+    // }
 
     LoxFunction bind(LoxInstance instance){
         Environment environment = new Environment(closure);
         environment.define("this", instance);
-        return new LoxFunction(declaration, environment);
+        return new LoxFunction(declaration, environment, isInitializer);
     }
     
 
@@ -51,6 +57,7 @@ public class LoxFunction implements LoxCallable{
         }   catch(Return returnValue){
             return returnValue.value;
         }
+        if(isInitializer) return closure.getAt(0, "this");
         return null;
     }
 }
