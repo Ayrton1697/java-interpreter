@@ -55,11 +55,12 @@ class Parser {
         Token name = consume(IDENTIFIER, "Expect class name.");
         consume(LEFT_BRACE, "Expect '{' before class body.");
         List<Stmt.Function> methods = new ArrayList<>();
-        while(!check(RIGTH_BRACE) && !isAtEnd()){
+        while(!check(RIGHT_BRACE) && !isAtEnd()){
+            // if(check(CLASS)) ...
             methods.add(function("method"));
         }
 
-        consume(RIGTH_BRACE, "Expect '}' after class body.");
+        consume(RIGHT_BRACE, "Expect '}' after class body.");
         return new Stmt.Class(name, methods);
     } 
 
@@ -200,10 +201,10 @@ class Parser {
     private List<Stmt> block(){
         List<Stmt> statements = new ArrayList<>();
 
-        while(!check(RIGTH_BRACE) && !isAtEnd()){
+        while(!check(RIGHT_BRACE) && !isAtEnd()){
             statements.add(declaration());
         }
-        consume(RIGTH_BRACE, "Expect '}' after block");
+        consume(RIGHT_BRACE, "Expect '}' after block");
         return statements;
     }
 
@@ -419,23 +420,23 @@ class Parser {
         }
 
             // Add support for anonymous functions
-        if (match(FUN)) {
-            Token funToken = previous();
-            consume(LEFT_PAREN, "Expect '(' after 'fun'.");
-            List<Token> parameters = new ArrayList<>();
-            if (!check(RIGHT_PAREN)) {
-                do {
-                    if (parameters.size() >= 255) {
-                        error(peek(), "Cannot have more than 255 parameters.");
-                    }
-                    parameters.add(consume(IDENTIFIER, "Expect parameter name."));
-                } while (match(COMMA));
-            }
-            consume(RIGHT_PAREN, "Expect ')' after parameters.");
-            consume(LEFT_BRACE, "Expect '{' before function body.");
-            List<Stmt> body = block();
-            return new Expr.Function(funToken, parameters, body); // New Expr type
-        }
+        // if (match(FUN)) {
+        //     Token funToken = previous();
+        //     consume(LEFT_PAREN, "Expect '(' after 'fun'.");
+        //     List<Token> parameters = new ArrayList<>();
+        //     if (!check(RIGHT_PAREN)) {
+        //         do {
+        //             if (parameters.size() >= 255) {
+        //                 error(peek(), "Cannot have more than 255 parameters.");
+        //             }
+        //             parameters.add(consume(IDENTIFIER, "Expect parameter name."));
+        //         } while (match(COMMA));
+        //     }
+        //     consume(RIGHT_PAREN, "Expect ')' after parameters.");
+        //     consume(LEFT_BRACE, "Expect '{' before function body.");
+        //     List<Stmt> body = block();
+        //     return new Expr.Function(funToken, parameters, body); // New Expr type
+        // }
 
         if(match(LEFT_PAREN)){
             Expr expr = expression();
