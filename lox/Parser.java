@@ -55,13 +55,19 @@ class Parser {
         Token name = consume(IDENTIFIER, "Expect class name.");
         consume(LEFT_BRACE, "Expect '{' before class body.");
         List<Stmt.Function> methods = new ArrayList<>();
+        List<Stmt.Function> staticMethods = new ArrayList<>();
         while(!check(RIGHT_BRACE) && !isAtEnd()){
-            // if(check(CLASS)) ...
-            methods.add(function("method"));
+            Boolean isStatic = match(CLASS);
+            if(isStatic){
+                staticMethods.add(function("static method"));
+            } else {
+                methods.add(function("method"));
+            }
+     
         }
 
         consume(RIGHT_BRACE, "Expect '}' after class body.");
-        return new Stmt.Class(name, methods);
+        return new Stmt.Class(name, methods, staticMethods);
     } 
 
     private Stmt statement(){
@@ -179,6 +185,7 @@ class Parser {
     }
 
     private Stmt.Function function(String kind){
+        // System.out.println(kind);
         Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
         consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
         List<Token> parameters = new ArrayList<>();

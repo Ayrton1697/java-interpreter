@@ -93,14 +93,21 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitClassStmt(Stmt.Class stmt){
+        
         environment.define(stmt.name.lexeme, null);
 
         Map<String, LoxFunction> methods = new HashMap<>();
+        Map<String, LoxFunction> staticMethods = new HashMap<>();
         for(Stmt.Function method : stmt.methods){
             LoxFunction function = new LoxFunction(method, environment, method.name.lexeme.equals("init"));
             methods.put(method.name.lexeme, function);
         }
-        LoxClass klass = new LoxClass(stmt.name.lexeme, methods);
+        for(Stmt.Function method : stmt.staticMethods){
+            LoxFunction function = new LoxFunction(method, environment, false);
+            staticMethods.put(method.name.lexeme, function);
+        }
+        LoxClass klass = new LoxClass(stmt.name.lexeme, methods, staticMethods);
+        System.out.println(staticMethods);
         environment.assign(stmt.name, klass);
         return null;
     }
@@ -290,6 +297,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         LoxCallable function = (LoxCallable)callee;
+
+        if (callee instanceof LoxClass) {
+            LoxClass klass = (LoxClass) callee;
+            return klass.call(this, arguments);
+        }
 
         if(arguments.size() != function.arity()){
             throw new RuntimeError(expr.paren, "Expected " +  function.arity() + " arguments but got " 

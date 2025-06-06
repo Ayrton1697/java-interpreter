@@ -1,0 +1,15 @@
+class Test {
+    testklass(){
+        print "testing class!";
+    }
+    class testtwo(){
+        print "this is static";
+    }
+}
+
+var test = Test();
+test.testklass();
+Test.testtwo();
+Test.field = 42;
+print(Test.field);
+

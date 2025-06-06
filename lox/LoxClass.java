@@ -11,6 +11,7 @@ public class LoxClass extends LoxInstance implements LoxCallable {
 
     LoxClass(String name, Map<String, LoxFunction> methods, Map<String, LoxFunction> staticMethods){
         super(null);
+        this.setKlass(this); 
         this.name = name;
         this.methods = methods;
         this.staticMethods = staticMethods;
@@ -19,6 +20,8 @@ public class LoxClass extends LoxInstance implements LoxCallable {
     LoxFunction findMethod(String name){
         if(methods.containsKey(name)){
             return methods.get(name);
+        } else if (staticMethods.containsKey(name)){
+                return staticMethods.get(name);
         }
         return null;
     }
