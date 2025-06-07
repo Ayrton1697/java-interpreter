@@ -12,7 +12,7 @@ public class LoxInstance {
     }
 
     Object get(Token name){
-        if(fields.containsKey(name.lexme)){
+        if(fields.containsKey(name.lexeme)){
             return fields.get(name.lexeme);
         }
 
@@ -23,8 +23,8 @@ public class LoxInstance {
         throw new RuntimeError(name, "Undefined property '" + name.lexeme + "'. ");
     }
 
-    Object set(Token name, Object value){
-        fields.put(name,value);
+    void set(Token name, Object value){
+        fields.put(name.lexeme,value);
     }
 
     @Override

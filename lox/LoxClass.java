@@ -1,14 +1,15 @@
 package lox;
 
-import jata.util.List;
-import jata.util.Map;
+import java.util.List;
+import java.util.Map;
 
-public class LoxClass implements LoxCallable {
+public class LoxClass extends LoxInstance implements LoxCallable {
     final String name;
 
-    private final java.util.Map<String, LoxFunction> methods;
+    private final Map<String, LoxFunction> methods;
 
     LoxClass(String name, Map<String, LoxFunction> methods){
+        super(null);
         this.name = name;
         this.methods = methods;
     }
@@ -29,7 +30,7 @@ public class LoxClass implements LoxCallable {
     public Object call(Interpreter interpreter,
                     List<Object> arguments){
         LoxInstance instance = new LoxInstance(this);
-        LoxFunction initializer = findMethod('init');
+        LoxFunction initializer = findMethod("init");
         if(initializer != null){
             initializer.bind(instance).call(interpreter, arguments);
         }

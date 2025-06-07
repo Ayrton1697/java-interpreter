@@ -24,8 +24,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     final Environment globals = new Environment();
     private Environment environment = globals;
-    // private final Map<Expr, Integer> locals = new HashMap<>();
-    private final Map<Expr, VariableLocation> locals = new HashMap<>();
+    private final Map<Expr, Integer> locals = new HashMap<>();
+
+    // challenge 
+    // private final Map<Expr, VariableLocation> locals = new HashMap<>();
 
     Interpreter(){
         globals.define("clock", new LoxCallable() {
@@ -60,10 +62,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         stmt.accept(this);
     }
 
-    void resolve(Expr expr, int depth, int index){
-        locals.put(expr,new VariableLocation(depth,index));
-        // challenge 4 pag 191
-        // hay que cambiar locals por un array y solo insertar las variables cada una en su index que pasamos
+    // void resolve(Expr expr, int depth, int index){
+    //     locals.put(expr,new VariableLocation(depth,index));
+    //     // challenge 4 pag 191
+    //     // hay que cambiar locals por un array y solo insertar las variables cada una en su index que pasamos
+    // }
+
+    void resolve(Expr expr, int depth) {
+       locals.put(expr, depth);
     }
 
     void executeBlock(List<Stmt> statements, Environment environment){
@@ -165,21 +171,41 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
 
-    @Override
-    public Object visitAssignExpr(Expr.Assign expr){
-        Object value = evaluate(expr.value);
+    // challenge
+    // @Override
+    // public Object visitAssignExpr(Expr.Assign expr){
+    //     Object value = evaluate(expr.value);
         
-        // environment.assign(expr.name,value);
-        // Integer distance = locals.get(expr);
-        VariableLocation location = locals.get(expr);
-        if(location != null){
-            // environment.assignAt(distance, expr.name, value);
-            environment.assignAt(location.depth, location.index, value);
-        } else {
-            globals.assign(expr.name, value);
-        }
+    //     // environment.assign(expr.name,value);
+    //     // Integer distance = locals.get(expr);
+    //     VariableLocation location = locals.get(expr);
+    //     if(location != null){
+    //         environment.assignAt(distance, expr.name, value);
+    //         // environment.assignAt(location.depth, location.index, value);
+    //     } else {
+    //         globals.assign(expr.name, value);
+    //     }
 
-        return value;
+    //     return value;
+    // }
+
+    @Override
+    public Object visitAssignExpr(Expr.Assign expr) {
+            Object value = evaluate(expr.value);
+        /* Statements and State visit-assign < Resolving and Binding resolved-assign
+            environment.assign(expr.name, value);
+        */
+        //> Resolving and Binding resolved-assign
+
+            Integer distance = locals.get(expr);
+            if (distance != null) {
+            environment.assignAt(distance, expr.name, value);
+            } else {
+            globals.assign(expr.name, value);
+            }
+
+        //< Resolving and Binding resolved-assign
+            return value;
     }
 
 
@@ -315,7 +341,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitThisExpr(Expr.This expr){
-        return new lookUpVariable(expr.keyword,expr);
+        return lookUpVariable(expr.keyword,expr);
     }
 
     @Override
@@ -345,28 +371,38 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         // return value;
 
         // return environment.get(expr.name);
-        return lookUpVariable(expr.name,expr);
+        return lookUpVariable(expr.name, expr);
     }
 
-    private Object lookUpVariable(Token name, Expr expr){
-        // Integer distance = locals.get(expr);
-        VariableLocation location = locals.get(expr);
-         // challenge 4 pag 191
-        // hay que buscar la variable por su index en vez de por el nombre
-        // osea, aca la obtenemos por nombre y traemos distance e index y lo pasamos a environment getAt
-        if(location != null){
-            // return environment.getAt(distance, name.lexeme);
-            return environment.getAt(location.depth, location.index);
-        } else{
-            return globals.get(name);
+    // private Object lookUpVariable(Token name, Expr expr){
+    //     // Integer distance = locals.get(expr);
+    //     VariableLocation location = locals.get(expr);
+    //      // challenge 4 pag 191
+    //     // hay que buscar la variable por su index en vez de por el nombre
+    //     // osea, aca la obtenemos por nombre y traemos distance e index y lo pasamos a environment getAt
+    //     if(location != null){
+    //         // return environment.getAt(distance, name.lexeme);
+    //         return environment.getAt(location.depth, location.index);
+    //     } else{
+    //         return globals.get(name);
+    //     }
+    // }
+
+    private Object lookUpVariable(Token name, Expr expr) {
+        Integer distance = locals.get(expr);
+        if (distance != null) {
+        return environment.getAt(distance, name.lexeme);
+        } else {
+        return globals.get(name);
         }
     }
 
 
-    @Override
-    public Object visitFunctionExpr(Expr.Function expr){
-        return new LoxFunction(null, expr, null,false);
-    }
+    // Anonymous functions support
+    // @Override
+    // public Object visitFunctionExpr(Expr.Function expr){
+    //     return new LoxFunction(null, expr,false);
+    // }
 
 
     private void checkNumberOperand(Token operator, Object operand){

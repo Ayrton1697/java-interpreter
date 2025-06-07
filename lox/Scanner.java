@@ -56,7 +56,7 @@ public class Scanner {
             case '(' : addToken(LEFT_PAREN); break;
             case ')' : addToken(RIGHT_PAREN); break;
             case '{' : addToken(LEFT_BRACE); break;
-            case '}' : addToken(RIGTH_BRACE); break;
+            case '}' : addToken(RIGHT_BRACE); break;
             case ',' : addToken(COMMA); break;
             case '.' : addToken(DOT); break;
             case '-' : addToken(MINUS); break;
