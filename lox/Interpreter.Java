@@ -115,7 +115,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
         LoxClass klass = new LoxClass(stmt.name.lexeme, (LoxClass)superclass,methods);
 
-        if(stmt.superclass != null){
+        if(superclass != null){
             environment = environment.enclosing;
         }
 
