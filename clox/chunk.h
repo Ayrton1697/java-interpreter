@@ -9,12 +9,20 @@ typedef enum {
     OP_RETURN,
 } OpCode;
 
+typedef struct{
+    int line;
+    int lineCount;
+} LineRun;
+
 typedef struct {
     int count;
     int capacity;
     uint8_t* code;
-    int* lines;
+    // int* lines;
     ValueArray constants;
+    LineRun* lines;
+    int lineCount;
+    int lineCapacity;
 } Chunk;
 
 void initChunk(Chunk* chunk);
