@@ -11,7 +11,7 @@ typedef enum {
 
 typedef struct{
     int line;
-    int lineCount;
+    int count;
 } LineRun;
 
 typedef struct {
@@ -21,8 +21,8 @@ typedef struct {
     // int* lines;
     ValueArray constants;
     LineRun* lines;
-    int lineCount;
-    int lineCapacity;
+    int lineCount; //tamaño del array de LineRun
+    int lineCapacity; //tamaño alocado del array de lines
 } Chunk;
 
 void initChunk(Chunk* chunk);

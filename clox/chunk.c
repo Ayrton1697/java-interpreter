@@ -23,10 +23,23 @@ void writeChunk(Chunk* chunk, uint8_t byte, int line){
         int oldCapacity = chunk->capacity;
         chunk->capacity = GROW_CAPACITY(oldCapacity);
         chunk->code = GROW_ARRAY(uint8_t, chunk->code,oldCapacity,chunk->capacity);
-        chunk->lines = GROW_ARRAY(int, chunk->lines,oldCapacity,chunk->capacity);
+        // chunk->lines = GROW_ARRAY(int, chunk->lines,oldCapacity,chunk->capacity);
     }
 
-    if(line == chunk->lineCount)
+    if(line != chunk->lines[chunk->lineCount - 1].line){
+        if(chunk->lineCapacity < chunk->lineCount + 1){
+            int oldLineCapacity = chunk->lineCapacity;
+            chunk->lineCapacity = GROW_CAPACITY(oldLineCapacity);
+            chunk->lines = GROW_ARRAY(LineRun, chunk->lines, oldLineCapacity, chunk->lineCapacity);
+        }
+        LineRun* run = &chunk->lines[chunk->lineCount];
+        run->line = line;
+        run->count = 1;
+        chunk->lineCount++;
+    } else {
+        chunk->lines[chunk->lineCount - 1].count++;
+    }
+
     chunk->code[chunk->count] = byte;
     // chunk->lines[chunk->count] = line;
     chunk->count++;
