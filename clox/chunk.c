@@ -49,3 +49,16 @@ int addConstant(Chunk* chunk, Value value){
     writeValueArray(&chunk->constants, value);
     return chunk->constants.count - 1;
 }
+
+// move this to error reporting file
+int getLine(Chunk* chunk, int offset){
+    int currentOffset = 0;
+    for(int i = 0; i < chunk->lineCount; i++){
+        LineRun* run = &chunk->lines[i];
+        if(offset < currentOffset +  run->count){
+            return run->line;
+        }
+        currentOffset+= run->count;
+    }
+    return -1;
+}
