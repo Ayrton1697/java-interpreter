@@ -17,6 +17,7 @@ static int constantInstruction(const char* name, Chunk* chunk, int offset){
     printf("\n");
     return offset + 2;
 }
+
 static int constantLongInstruction(const char* name, Chunk* chunk, int offset){
     uint16_t constant = (uint16_t)(chunk->code[offset++] << 8); // 0x01 << 8 = 0x0100
     constant |= chunk->code[offset++];    
