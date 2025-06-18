@@ -8,6 +8,7 @@ int main(int argc, const char* argv[]){
 
     int constant = addConstant(&chunk, 1.2);
     writeChunk(&chunk, OP_CONSTANT, 123);
+    // if OP_CONSTANT_LONG --> writeConstant(&chunk, etc etc);
     writeChunk(&chunk, constant, 123);
 
     writeChunk(&chunk, OP_RETURN, 123);
