@@ -22,7 +22,7 @@ void push(Value value){
     vm.stackTop++;
 }
 
-Value pop(Value value){
+Value pop(){
     vm.stackTop--;
     return *vm.stackTop;
 }
