@@ -31,10 +31,10 @@ static InterpretResult run(){
     #define READ_BYTE() (*vm.ip++)
     #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
     #define BINARY_OP(op) \
-        do {  \
-            double b = pop();  \ 
+        do { \
+            double b = pop(); \
             double a = pop(); \
-            push(a op b);  \
+            push(a op b); \
         } while (false)
 
     for (;;){
