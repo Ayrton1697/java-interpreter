@@ -6,7 +6,24 @@
 VM vm;
 
 static void resetStack(){
+    vm.capacity = 8;
+    if (vm.stack != NULL){
+        free(vm.stack);
+    }
+    vm.stack = (Value*)malloc(vm.capacity * sizeof(Value));
+    if(vm.stack == NULL) exit(1);
     vm.stackTop = vm.stack;
+    vm.size = 0;
+}
+
+void* reallocate(void* ptr,size_t new_size){
+    if(new_size == 0){
+        free(ptr);
+        return NULL;
+    }
+        void* new_ptr = realloc(ptr,new_size * sizeof(Value));
+        if (new_ptr == NULL) exit(1);
+        return new_ptr;
 }
 
 void initVM(){
@@ -18,8 +35,17 @@ void freeVM(){
 }
 
 void push(Value value){
+    if(vm.size >= vm.capacity){
+        size_t oldCapacity = vm.capacity;
+        int newCap = oldCapacity * 2;
+        vm.capacity = newCap;
+        size_t stack_offset = vm.stackTop - vm.stack;
+        vm.stack = reallocate(vm.stack,newCap);
+        vm.stackTop = vm.stack + stack_offset;
+    }
     *vm.stackTop = value;
     vm.stackTop++;
+    vm.size++;
 }
 
 Value pop(){
