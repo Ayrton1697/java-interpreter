@@ -50,6 +50,7 @@ void push(Value value){
 
 Value pop(){
     vm.stackTop--;
+    vm.size--;
     return *vm.stackTop;
 }
 
@@ -86,7 +87,13 @@ static InterpretResult run(){
             case OP_SUBSTRACT: BINARY_OP(-); break;
             case OP_MULTIPLY: BINARY_OP(*); break;
             case OP_DIVIDE: BINARY_OP(/); break;
-            case OP_NEGATE: push(-pop()); break;
+            // case OP_NEGATE: push(-pop()); break;
+            case OP_NEGATE: 
+                if (vm.stackTop == vm.stack) { //si esta vacio no podemos buscar el index -1
+                    fprintf(stderr, "Stack underflow in OP_NEGATE.\n");
+                    exit(1);
+                } 
+                vm.stackTop[-1] = (Value) - vm.stackTop[-1];
             case OP_RETURN:{
                 printValue(pop());
                 printf("\n");
