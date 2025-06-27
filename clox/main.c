@@ -33,10 +33,12 @@ static char* readFile(const char* path){
     char* buffer = (char*)malloc(fileSize +1);
     if(buffer == NULL){
         fprintf(stderr, "Not enough memory tor read \"%s\".\n", path);
+        exit(74);
     }
     size_t bytesRead = fred(buffer,sizeof(char),fileSize, file);
     if(bytesRead < fileSize){
         fprintf(stderr,"Could not read file \"%s\".\n",path);
+        exit(74);
     }
     buffer[bytesRead] = '\0';
 
