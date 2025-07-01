@@ -18,3 +18,15 @@ void initScanner(const char* source){
     scanner.current = source;
     scanner.line = 1;
 }
+
+static bool isAtEnd(){
+    return *scanner.current == '\0';
+}
+
+Token scanToken(){
+    scanner.start = scanner.current;
+
+    if(isAtEnd()) return makeToken(TOKEN_EOF);
+
+    return errorToken("Unexpected character.");
+}
