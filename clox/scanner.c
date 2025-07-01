@@ -23,6 +23,26 @@ static bool isAtEnd(){
     return *scanner.current == '\0';
 }
 
+static Token makeToken(TokenType type){
+    Token token;
+    token.type = type;
+    token.length = (int)(scanner.current - scanner.start);
+    token.line = scanner.line;
+    token.start = scanner.start;
+    return token;
+}
+
+static Token errorToken(const char* message){
+    Token token;
+    token.type = TOKEN_ERROR;
+    token.length = (int)strlen(message);
+    token.line = scanner.line;
+    token.start = message;
+
+    return token;
+}
+
+
 Token scanToken(){
     scanner.start = scanner.current;
 
