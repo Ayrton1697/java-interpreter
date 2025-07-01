@@ -54,6 +54,21 @@ static Token errorToken(const char* message){
     return token;
 }
 
+static void skipwhiteSpace(){
+    for(;;){
+        char c = peek();
+        switch(c){
+            case ' ':
+            case '\r':
+            case '\t':
+                advance();
+                break;
+            default:
+                return;
+        }
+    }
+}
+
 
 Token scanToken(){
     skipWhiteSpace();
