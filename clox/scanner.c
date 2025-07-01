@@ -56,6 +56,7 @@ static Token errorToken(const char* message){
 
 
 Token scanToken(){
+    skipWhiteSpace();
     scanner.start = scanner.current;
 
     if(isAtEnd()) return makeToken(TOKEN_EOF);
