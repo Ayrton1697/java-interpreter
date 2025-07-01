@@ -28,6 +28,13 @@ static char advance(){
     return scanner.current[-1];
 }
 
+static bool match(char expected){
+    if(isAtEnd()) return false;
+    if (*scanner.current != expected) return false;
+    scanner.current++;
+    return true;
+}
+
 static Token makeToken(TokenType type){
     Token token;
     token.type = type;
