@@ -100,6 +100,16 @@ static void skipwhiteSpace(){
     }
 }
 
+static TokenType checkKeyword(int start, int length,
+    const char* rest, TokenType type){
+        if(scanner.current - scanner.start == start + length &&
+        memcmp(scanner.start + start, rest, length) == 0){
+            return type;
+        }
+
+        return TOKEN_IDENTIFIER;
+}
+
 static TokenType identifierType(){
     switch (scanner.start[0]){
         case 'a': return checkKeyword(1,2,"nd", TOKEN_AND);
