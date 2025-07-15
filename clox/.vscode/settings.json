@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "scanner.h": "c",
+        "compiler.h": "c"
+    }
+}
