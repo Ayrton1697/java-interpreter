@@ -13,7 +13,7 @@ typedef struct {
 Parser parser;
 
 static void errorAt(Token* token, const char* message){
-    fprint(stderr, "[line %d] Error", token->line);
+    fprintf(stderr, "[line %d] Error", token->line);
     if(token->type == TOKEN_EOF){
         fprintf(stderr, " at end");
     } else if (token->type == TOKEN_ERROR){
