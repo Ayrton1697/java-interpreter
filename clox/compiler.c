@@ -4,6 +4,35 @@
 #include "compiler.h"
 #include "scanner.h"
 
+typedef struct {
+    Token current;
+    Token previous;
+    bool hadError;
+} Parser;
+
+Parser parser;
+
+static void errorAt(Token* token, const char* message){
+    fprint(stderr, "[line %d] Error", token->line);
+    if(token->type == TOKEN_EOF){
+        fprintf(stderr, " at end");
+    } else if (token->type == TOKEN_ERROR){
+        //nothing
+    } else {
+        fprintf(stderr, " at '%.*s'", token->length, token->start);
+    }
+    fprintf(stderr, ": %s\n", message);
+    parser.hadError = true;
+}   
+
+static void error(const char* message){
+    errorAt(&parser.previous, message);
+}
+
+static void errorAtCurrent(const char* message){
+    errorAt(&parser.current, message);
+}
+
 static void advance(){
     parser.previous = parser.current;
     for(;;){
