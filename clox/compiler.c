@@ -113,6 +113,10 @@ static void unary(){
     }
 }
 
+static void parsePrecedence(Precedence precedence){
+        
+}
+
 bool compile(const char* source, Chunk* chunk){
     initScanner(source);
     compilingChunk = chunk;
