@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "common.h" 
-#include <scanner.h>
+#include "scanner.h"
 
 
 typedef struct {
@@ -73,7 +73,7 @@ static Token errorToken(const char* message){
     return token;
 }
 
-static void skipwhiteSpace(){
+static void skipWhiteSpace(){
     for(;;){
         char c = peek();
         switch(c){
@@ -186,10 +186,11 @@ Token scanToken(){
     if(isAtEnd()) return makeToken(TOKEN_EOF);
 
     char c = advance();
+    
+    if (isAlpha(c)) return identifier();
+    if (isDigit(c)) return number();
 
     switch(c){
-        if(isAlpha(c)) return identifier();
-        if(isDigit(c)) return number();
         case '(': return makeToken(TOKEN_LEFT_PAREN);
         case ')': return makeToken(TOKEN_RIGHT_PAREN);
         case '{': return makeToken(TOKEN_LEFT_BRACE);

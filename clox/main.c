@@ -35,7 +35,7 @@ static char* readFile(const char* path){
         fprintf(stderr, "Not enough memory tor read \"%s\".\n", path);
         exit(74);
     }
-    size_t bytesRead = fred(buffer,sizeof(char),fileSize, file);
+    size_t bytesRead = fread(buffer,sizeof(char),fileSize, file);
     if(bytesRead < fileSize){
         fprintf(stderr,"Could not read file \"%s\".\n",path);
         exit(74);
@@ -62,7 +62,7 @@ int main(int argc, const char* argv[]){
     if(argc == 1){
         repl();
     } else if (argc == 2){
-        runfile(argv[1]);
+        runFile(argv[1]);
     } else {
         fprintf(stderr, "Usage: clox [path]'n");
         exit(64);
@@ -70,3 +70,6 @@ int main(int argc, const char* argv[]){
     freeVM();
     return 0;
 }
+
+
+// gcc -o main.exe (Get-ChildItem *.c).Name -Wall -Wextra -v

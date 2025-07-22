@@ -5,6 +5,10 @@
 #include "compiler.h"
 #include "scanner.h"
 
+#ifdef DEBUG_PRINT_CODE
+#include "debug.h"
+#endif
+
 typedef struct {
     Token current;
     Token previous;
@@ -96,7 +100,7 @@ static void emitReturn(){
     emitByte(OP_RETURN);
 }
 
-static uint8_t emitConstant(Value value){
+static uint8_t makeConstant(Value value){
     int constant = addConstant(currentChunk(), value);
     if (constant > UINT8_MAX){
         error("Too many constants in one chunk.");
@@ -111,11 +115,18 @@ static void emitConstant(Value value){
 
 static void endCompiler(){
     emitReturn();
+    #ifdef DEBUG_PRINT_CODE
+    if(!parser.hadError){
+        disassembleChunk(currentChunk(),"code");
+    }
+    #endif
+
 }
+
 
 static void expression();
 static ParseRule* getRule(TokenType type);
-static void ParsePrecedence(Precedence precedence);
+static void parsePrecedence(Precedence precedence);
 
 static void binary(){
     TokenType operatorType = parser.previous.type;
