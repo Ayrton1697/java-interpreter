@@ -73,3 +73,5 @@ int main(int argc, const char* argv[]){
 
 
 // gcc -o main.exe (Get-ChildItem *.c).Name -Wall -Wextra -v
+//  gdb .\main.exe > call_history2.txt 2>&1
+// run > program_stdout.txt 2> program_stderr.txt

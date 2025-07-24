@@ -1,0 +1,12 @@
+Starting program: E:\ayrto\crafting-interpreters\first\clox\main.exe > program_stdout.txt 2> program_stderr.txt
+[New Thread 23724.0xacc]
+[New Thread 23724.0x6670]
+[Thread 23724.0xacc exited with code 0]
+[Thread 23724.0x6670 exited with code 0]
+[Inferior 1 (process 23724) exited normally]
+Starting program: E:\ayrto\crafting-interpreters\first\clox\main.exe > program_stdout.txt 2> program_stderr.txt
+[New Thread 38696.0x6f94]
+[New Thread 38696.0x3cd0]
+[Thread 38696.0x3cd0 exited with code 0]
+[Thread 38696.0x6f94 exited with code 0]
+[Inferior 1 (process 38696) exited normally]

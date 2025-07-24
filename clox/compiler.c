@@ -137,6 +137,7 @@ static ParseRule* getRule(TokenType type);
 static void parsePrecedence(Precedence precedence);
 
 static void binary(){
+logFunction("binary","");
     TokenType operatorType = parser.previous.type;
     ParseRule* rule = getRule(operatorType);
     parsePrecedence((Precedence)(rule->precedence+1));
@@ -150,6 +151,7 @@ static void binary(){
     default:
         break;
     }
+logFunctionExit("binary");
 }
 
 static void expression(){

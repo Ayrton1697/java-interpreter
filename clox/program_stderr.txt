@@ -1,0 +1,41 @@
+[TRACE] Enter compile (source=(-1+2)*3 - -4
+)
+[TRACE] Enter expression
+[TRACE] Enter parsePrecedence (precedence=1)
+[TRACE] Enter grouping
+[TRACE] Enter expression
+[TRACE] Enter parsePrecedence (precedence=1)
+[TRACE] Enter unary (operatorType=6)
+[TRACE] Enter parsePrecedence (precedence=8)
+[TRACE] Enter number (value=1.000000)
+[TRACE] Exit number
+[TRACE] Exit parsePrecedence
+[TRACE] Exit unary
+[TRACE] Enter binary
+[TRACE] Enter parsePrecedence (precedence=7)
+[TRACE] Enter number (value=2.000000)
+[TRACE] Exit number
+[TRACE] Exit parsePrecedence
+[TRACE] Exit binary
+[TRACE] Exit parsePrecedence
+[TRACE] Exit expression
+[TRACE] Exit grouping
+[TRACE] Enter binary
+[TRACE] Enter parsePrecedence (precedence=8)
+[TRACE] Enter number (value=3.000000)
+[TRACE] Exit number
+[TRACE] Exit parsePrecedence
+[TRACE] Exit binary
+[TRACE] Enter binary
+[TRACE] Enter parsePrecedence (precedence=7)
+[TRACE] Enter unary (operatorType=6)
+[TRACE] Enter parsePrecedence (precedence=8)
+[TRACE] Enter number (value=4.000000)
+[TRACE] Exit number
+[TRACE] Exit parsePrecedence
+[TRACE] Exit unary
+[TRACE] Exit parsePrecedence
+[TRACE] Exit binary
+[TRACE] Exit parsePrecedence
+[TRACE] Exit expression
+[TRACE] Exit compile
