@@ -1,0 +1,4 @@
+set logging file gdb_logs.txt
+set logging enabled on
+run < input.txt
+quit

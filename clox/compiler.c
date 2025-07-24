@@ -42,6 +42,14 @@ typedef struct {
 Parser parser;
 Chunk* compilingChunk;
 
+static void logFunction(const char* funcName, const char* extra) {
+    fprintf(stderr, "[TRACE] Enter %s%s\n", funcName, extra ? extra : "");
+}
+
+static void logFunctionExit(const char* funcName) {
+    fprintf(stderr, "[TRACE] Exit %s\n", funcName);
+}
+
 static Chunk* currentChunk(){
     return compilingChunk;
 }
@@ -145,22 +153,32 @@ static void binary(){
 }
 
 static void expression(){
+    logFunction("expression", "");
     parsePrecedence(PREC_ASSIGNMENT);
+    logFunctionExit("expression");
 }
 
 static void grouping(){
+    logFunction("grouping", "");
     expression();
     consume(TOKEN_RIGHT_PAREN, "Expect ')' after expression.");
+    logFunctionExit("grouping");
 }
 
 static void number(){
+    char extra[64];
     double value = strtod(parser.previous.start, NULL);
+    snprintf(extra, sizeof(extra), " (value=%f)", value);
+    logFunction("number", extra);
     emitConstant(value);
+    logFunctionExit("number");
 }
 
 static void unary(){
+char extra[32];
     TokenType operatorType = parser.previous.type;
-
+snprintf(extra, sizeof(extra), " (operatorType=%d)", operatorType);
+logFunction("unary", extra);
     // compile the operand
     parsePrecedence(PREC_UNARY);
 
@@ -169,13 +187,14 @@ static void unary(){
         case TOKEN_MINUS: emitByte(OP_NEGATE); break;
         default: return;
     }
+logFunctionExit("unary");
 }
 
 ParseRule rules[] = {
     [TOKEN_LEFT_PAREN] = {grouping, NULL, PREC_NONE},
     [TOKEN_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
     [TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE},
-    [TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE},
+    [TOKEN_RIGHT_BRACE] = {NULL, NULL, PREC_NONE},
     [TOKEN_COMMA] = {NULL, NULL, PREC_NONE},
     [TOKEN_DOT] = {NULL, NULL, PREC_NONE},
     [TOKEN_MINUS] = {unary, binary, PREC_TERM},
@@ -215,6 +234,9 @@ ParseRule rules[] = {
 };
 
 static void parsePrecedence(Precedence precedence){
+ char extra[32];
+snprintf(extra, sizeof(extra), " (precedence=%d)", precedence);
+logFunction("parsePrecedence", extra);
     advance();
     ParseFn prefixRule = getRule(parser.previous.type)->prefix;
     if(prefixRule == NULL){
@@ -229,7 +251,7 @@ static void parsePrecedence(Precedence precedence){
         ParseFn infixRule = getRule(parser.previous.type)->infix;
         infixRule();
     }
-        
+logFunctionExit("parsePrecedence");   
 }
 
 static ParseRule* getRule(TokenType type){
@@ -237,6 +259,9 @@ static ParseRule* getRule(TokenType type){
 }
 
 bool compile(const char* source, Chunk* chunk){
+char extra[256];
+snprintf(extra, sizeof(extra), " (source=%s)", source);
+logFunction("compile", extra);
     initScanner(source);
     compilingChunk = chunk;
     parser.hadError = false;
@@ -258,5 +283,6 @@ bool compile(const char* source, Chunk* chunk){
     expression();
     consume(TOKEN_EOF, "Expect end of expression");
     endCompiler();
+logFunctionExit("compile");
     return !parser.hadError;
 }

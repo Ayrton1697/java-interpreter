@@ -1,0 +1,3 @@
+[New Thread 19612.0x740]
+[Thread 19612.0x740 exited with code 0]
+[Inferior 1 (process 19612) exited normally]
