@@ -1,0 +1,10 @@
+No symbol "inferior" in current context.
+Starting program: E:\ayrto\crafting-interpreters\first\clox\main.exe 
+[New Thread 33608.0x1014]
+[Thread 33608.0x1014 exited with code 0]
+[New Thread 33608.0x8098]
+
+Thread 3 received signal SIGINT, Interrupt.
+[Switching to Thread 33608.0x8098]
+0x00007ff8e8c6d507 in TlsGetValue () from C:\Windows\System32\KernelBase.dll
+Quit (expect signal SIGINT when the program is resumed)
