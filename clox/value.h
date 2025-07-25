@@ -17,7 +17,11 @@ typedef struct {
     } as;
 } Value;
 
-typedef double Value;
+#define BOOL_VAL(value) ((Value){VAL_BOOL,{.boolean = value}})
+#define NIL_VAL(value) ((Value){VAL_NIL,{.number = 0}})
+#define NUMBER_VAL(value) ((Value){VAL_NUMBER,{.number = value}})
+
+// typedef double Value;
 
 typedef struct{
     int capacity;
