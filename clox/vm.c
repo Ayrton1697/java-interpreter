@@ -11,6 +11,7 @@ static void resetStack(){
 }
 
 static void runtimeError(const char* format, ...){
+    // entender
     va_list args;
     va_start(args,format);
     vfprintf(stderr,format,args);
