@@ -34,3 +34,7 @@ void printValue(Value value){
     }
     printf("%g", AS_NUMBER(value));
 }
+
+bool valuesEqual(Value a, Value b){
+    
+}
