@@ -92,6 +92,8 @@ static InterpretResult run(){
                 Value a = pop();
                 push(BOOL_VAL(valuesEqual(a,b)));
             } break;
+            case OP_GREATER: BINARY_OP(BOOL_VAL, >); break;
+            case OP_LESS: BINARY_OP(BOOL_VAL, <); break;
             case OP_ADD: BINARY_OP(NUMBER_VAL, +); break;
             case OP_SUBSTRACT: BINARY_OP(NUMBER_VAL,-); break;
             case OP_MULTIPLY: BINARY_OP(NUMBER_VAL,*); break;
