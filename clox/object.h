@@ -25,6 +25,15 @@ struct ObjString{
     char chars[];
 };
 
+struct ObjString{ //for second chall
+    Obj obj;
+    int length;
+    bool freeable;
+    char* chars;
+};
+
+  
+
 ObjString* takeString(char* chars, int length);
 
 ObjString* copyString(const char* chars, int length);

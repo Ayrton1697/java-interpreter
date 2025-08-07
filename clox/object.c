@@ -19,14 +19,15 @@ static Obj* allocateObject(size_t size, ObjType type){
     return object;
 }
 
-static ObjString* allocateString(size_t size, int length){
+static ObjString* allocateString(size_t size, int length, bool freeable){
     ObjString* string = (ObjString*)allocateObject(size, OBJ_STRING);
+    string->freeable = freeable;
     string-> length = length;
     return string;
 }
 
 ObjString* takeString(char* chars, int length){
-    return allocateString(chars, length);
+    return allocateString(chars, length, true);
 }
 
 ObjString* copyString(const char* chars, int length){
@@ -39,7 +40,7 @@ ObjString* copyString(const char* chars, int length){
 
 ObjString* copyStringEfficient(const char* chars, int length){
     size_t size = sizeof(ObjString) + length + 1;
-    ObjString* string = allocateString(size, length);
+    ObjString* string = allocateString(size, length, false);
     memcpy(string->chars, chars, length);  
     string->chars[length] = '\0' ;
     return string;
