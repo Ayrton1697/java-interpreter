@@ -5,7 +5,12 @@
 #include "value.h"
 
 typedef struct {
-    ObjString* key;
+    // ObjString* key;
+    union {
+        ObjString* key;
+        int key;
+        bool key;
+    } key;
     Value value;
 } Entry;
 
