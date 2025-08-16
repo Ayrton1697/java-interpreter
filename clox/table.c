@@ -24,14 +24,14 @@ static Entry* findEntry(Entry* entries, int capacity, Value key, int hash){
     Entry* tombstone = NULL;
     for(;;){
         Entry* entry = &entries[index];
-        if(entry->key == NULL){
+        if(IS_NIL(entry->key)){
             if(IS_NIL(entry->value)){
                 // empty entry
                 return tombstone != NULL ? tombstone : entry;
             } else {
                 if(tombstone == NULL) tombstone = entry;
             } 
-        }  else if(entry->key == key) {
+        }  else if(valuesEqual(entry->key, key)) {
             return entry;
         }
 
@@ -87,9 +87,9 @@ bool tableSet(Table* table, Value key, Value value){
         int capacity = GROW_CAPACITY(table->capacity);
         adjustCapacity(table, capacity);
     }
-    int hash = hashValue(key);
+    uint32_t  hash = hashValue(key);
     Entry* entry = findEntry(table->entries, table->capacity, key, hash);
-    bool isNewKey = entry->key == NULL;
+    bool isNewKey = IS_NIL(entry->key);
     if(isNewKey && IS_NIL(entry->value)) table->count++;
 
     entry->key = key;
@@ -99,7 +99,7 @@ bool tableSet(Table* table, Value key, Value value){
 
 bool tableDelete(Table* table, Value key){
     if(table->count == 0) return false;
-    Entry* entry = findEntry(table->entries, table->capacity, key, hash);
+    Entry* entry = findEntry(table->entries, table->capacity, key);
     if(entry == NULL) return false;
     entry->key = NULL;
     entry->value = BOOL_VAL(true);

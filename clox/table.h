@@ -6,13 +6,13 @@
 
 typedef struct {
     // ObjString* key;
-    union {
-        ObjString* strkey;
-        int intkey;
-        bool boolkey;
-    } key;
+    // union {
+    //     ObjString* strkey;
+    //     int intkey;
+    //     bool boolkey;
+    // } key;
+    Value key;
     int hash;
-    ObjString* tag;
     Value value;
 } Entry;
 
