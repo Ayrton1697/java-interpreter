@@ -19,8 +19,8 @@ void freeTable(Table* table){
     initTable(table);
 }
 
-static Entry* findEntry(Entry* entries, int capacity, ObjString* key){
-    uint32_t index = key->hash % capacity;
+static Entry* findEntry(Entry* entries, int capacity, Value key, int hash){
+    uint32_t index = hash % capacity;
     Entry* tombstone = NULL;
     for(;;){
         Entry* entry = &entries[index];
@@ -71,13 +71,24 @@ static void adjustCapacity(Table* table, int capacity){
     table->capacity = capacity;
 }   
 
-bool tableSet(Table* table, ObjString* key, Value value){
+int hashValue(Value key){
+    switch (key.type)
+    {
+    case VAL_BOOL:return 0;
+    case VAL_NUMBER: return 1;
+    case VAL_NIL: return 0;
+    case VAL_OBJ: return 0;
+    break;
+    }
+}
+
+bool tableSet(Table* table, Value key, Value value){
     if(table->count +1 > table->capacity * TABLE_MAX_LOAD){
         int capacity = GROW_CAPACITY(table->capacity);
         adjustCapacity(table, capacity);
     }
-
-    Entry* entry = findEntry(table->entries, table->capacity, key);
+    int hash = hashValue(key);
+    Entry* entry = findEntry(table->entries, table->capacity, key, hash);
     bool isNewKey = entry->key == NULL;
     if(isNewKey && IS_NIL(entry->value)) table->count++;
 
@@ -86,9 +97,9 @@ bool tableSet(Table* table, ObjString* key, Value value){
     return isNewKey;
 }
 
-bool tableDelete(Table* table, ObjString* key){
+bool tableDelete(Table* table, Value key){
     if(table->count == 0) return false;
-    Entry* entry = findEntry(table->entries, table->capacity, key);
+    Entry* entry = findEntry(table->entries, table->capacity, key, hash);
     if(entry == NULL) return false;
     entry->key = NULL;
     entry->value = BOOL_VAL(true);

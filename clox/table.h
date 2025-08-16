@@ -7,10 +7,12 @@
 typedef struct {
     // ObjString* key;
     union {
-        ObjString* key;
-        int key;
-        bool key;
+        ObjString* strkey;
+        int intkey;
+        bool boolkey;
     } key;
+    int hash;
+    ObjString* tag;
     Value value;
 } Entry;
 
