@@ -39,11 +39,11 @@ static Entry* findEntry(Entry* entries, int capacity, Value key, int hash){
     }
 }
 
-bool tableGet(Table* table, ObjString* key, Value* value){
+bool tableGet(Table* table, Value key, Value* value){
     if(table->count == 0) return false;
-
-    Entry* entry = findEntry(table->entries, table->capacity, key);
-    if(entry->key == NULL) return false;
+    uint32_t  hash = hashValue(key);
+    Entry* entry = findEntry(table->entries, table->capacity, key, hash);
+    if(IS_NIL(entry->key)) return false;
 
     *value = entry->value;
     return true;
@@ -52,15 +52,14 @@ bool tableGet(Table* table, ObjString* key, Value* value){
 static void adjustCapacity(Table* table, int capacity){
     Entry* entries = ALLOCATE(Entry, capacity);
     for(int i = 0; i < capacity; i++){
-        entries[i].key = NULL;
+        entries[i].key = NIL_VAL;
         entries[i].value = NIL_VAL;
     }
     table->count = 0;
     for(int i = 0; i < table->capacity; i++){
         Entry* entry = &table->entries[i];
-        if(entry->key == NULL) continue;
-
-        Entry* dest = findEntry(entries, capacity, entry->key);
+        if(IS_NIL(entry->key) == NULL) continue;
+        Entry* dest = findEntry(entries, capacity, entry->key, entry->hash);
         dest->key = entry->key;
         dest->value = entry->value;
         table->count++;
@@ -99,9 +98,10 @@ bool tableSet(Table* table, Value key, Value value){
 
 bool tableDelete(Table* table, Value key){
     if(table->count == 0) return false;
-    Entry* entry = findEntry(table->entries, table->capacity, key);
+    uint32_t  hash = hashValue(key);
+    Entry* entry = findEntry(table->entries, table->capacity, key, hash);
     if(entry == NULL) return false;
-    entry->key = NULL;
+    entry->key = NIL_VAL; //este tipo no existe, habria que agregarlo
     entry->value = BOOL_VAL(true);
     return true;
 }
@@ -109,7 +109,7 @@ bool tableDelete(Table* table, Value key){
 void tableAddAll(Table* from, Table* to){
     for(int i = 0; i < from->capacity; i++){
             Entry* entry = &from->entries[i];
-            if(entry->key != NULL){
+            if(!IS_NIL(entry->key)){
                 tableSet(to, entry->key, entry->value);
             }
     }
@@ -120,10 +120,11 @@ ObjString* tableFindString(Table* table, const char* chars, int length, uint32_t
     uint32_t index = hash % table->capacity;
     for(;;){
         Entry* entry = &table->entries[index];
-        if(entry->key == NULL){
+        if(IS_NIL(entry->key) == NULL){
             if(IS_NIL(entry->value)) return NULL;
-        } else if (entry->key->length == length && 
-            entry->key->hash == hash &&
+        } else if (
+            entry->key->length == length && 
+            entry->hash == hash &&
             memcmp(entry->key->chars, chars, length) == 0){
             
             return entry->key;
