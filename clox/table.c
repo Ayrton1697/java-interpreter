@@ -73,10 +73,32 @@ static void adjustCapacity(Table* table, int capacity){
 int hashValue(Value key){
     switch (key.type)
     {
-    case VAL_BOOL:return 0;
-    case VAL_NUMBER: return 1;
+    case VAL_BOOL:{
+        Value key2;
+        if(AS_BOOL(key) == true) {
+            key2.type = VAL_NUMBER; 
+            key2.as.number = 1.0;
+        } else {
+            key2.type = VAL_NUMBER; 
+            key2.as.number = 0.0;
+        }
+        return hashValue(key2);
+    };
+    case VAL_NUMBER: {
+      // 1. Reinterpret the double's bits as a 64-bit integer.
+      uint64_t bits;
+      memcpy(&bits, &key.as.number, sizeof(uint64_t));
+
+      // 2. Perform a bitwise hash (XOR-shift) on the integer bits.
+      // This folds the high 32 bits into the low 32 bits.
+      return (uint32_t)(bits ^ (bits >> 32));
+    };
     case VAL_NIL: return 0;
-    case VAL_OBJ: return 0;
+    case VAL_OBJ:{
+        return AS_STRING(key)->hash;
+    };
+    default:
+        return 0;
     break;
     }
 }
@@ -93,6 +115,7 @@ bool tableSet(Table* table, Value key, Value value){
 
     entry->key = key;
     entry->value = value;
+    entry->hash = hash;
     return isNewKey;
 }
 
