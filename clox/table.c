@@ -120,14 +120,17 @@ ObjString* tableFindString(Table* table, const char* chars, int length, uint32_t
     uint32_t index = hash % table->capacity;
     for(;;){
         Entry* entry = &table->entries[index];
-        if(IS_NIL(entry->key) == NULL){
+        if(IS_NIL(entry->key)){
             if(IS_NIL(entry->value)) return NULL;
-        } else if (
-            entry->key->length == length && 
-            entry->hash == hash &&
-            memcmp(entry->key->chars, chars, length) == 0){
+        } else if (IS_STRING(entry->key)){
+            ObjString* string = AS_STRING(entry->key);
             
-            return entry->key;
+            if(string->length == length && 
+            entry->hash == hash &&
+            memcmp(string->chars, chars, length) == 0){
+            
+            return string;
+        }
         }
         index = (index + 1) % table->capacity;
     }
