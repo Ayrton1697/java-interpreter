@@ -47,6 +47,8 @@ int dissasembleInstruction(Chunk* chunk, int offset){
         return simpleInstruction("OP_GREATER", offset);
     case OP_LESS:
         return simpleInstruction("OP_LESS", offset);
+    case OP_POP:
+        return simpleInstruction("OP_POP", offset);
     case OP_EQUAL:
         return simpleInstruction("OP_EQUAL", offset);
     case OP_ADD:
