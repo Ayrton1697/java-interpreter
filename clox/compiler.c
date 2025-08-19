@@ -176,6 +176,19 @@ static void expression(){
     parsePrecedence(PREC_ASSIGNMENT);
 }
 
+static void varDeclaration(){
+    uint8_t global = parseVariable("Expect variable name.");
+
+    if(match(TOKEN_EQUAL)){
+        expression();
+    } else {
+        emitByte(OP_NIL);
+    }
+    consume(TOKEN_SEMICOLON, "Expect ';' after variable declaration.");
+
+    defineVariable(global);
+}
+
 static void expressionStatement(){
     expression();
     consume(TOKEN_SEMICOLON, "Expect ';' after expression.");
@@ -212,7 +225,12 @@ static void synchronize(){
 }
 
 static void declaration(){
-    statement();
+    if(match(TOKEN_VAR)){
+        varDeclaration();
+    } else {
+        statement();
+    }
+
 
     if(parser.panicMode) synchronize();
 }
