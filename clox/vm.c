@@ -31,10 +31,13 @@ static void runtimeError(const char* format, ...){
 void initVM(){
     resetStack();
     vm.objects = NULL;
+
+    initTable(&vm.globals);
     initTable(&vm.strings);
 }
 
 void freeVM(){
+    freeTable(&vm.globals);
     freeTable(&vm.strings);
     freeObjects();
 }
@@ -160,6 +163,7 @@ static InterpretResult run(){
     }
     #undef READ_BYTE
     #undef READ_CONSTANT
+    #undef READ_STRING
     #undef BINARY_OP
 }
 
