@@ -34,9 +34,9 @@ void printValue(Value value){
             break;
         case VAL_NIL: printf("nil"); break;
         case VAL_NUMBER: printf("%g", AS_NUMBER(value)); break;
-        case VAL_OBJ: printObject(value);
+        case VAL_OBJ: printObject(value); break;
     }
-    printf("%g", AS_NUMBER(value));
+    // printf("%g", AS_NUMBER(value));
 }
 
 bool valuesEqual(Value a, Value b){

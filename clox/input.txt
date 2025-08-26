@@ -1,2 +1,4 @@
-var breakfast = 44; 
+var breakfast = "huevo"; 
+var caca = "leche"; 
+breakfast = "caca con " + caca; 
 print breakfast;
