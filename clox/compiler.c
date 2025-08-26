@@ -206,6 +206,15 @@ static void varDeclaration(){
     uint8_t global = parseVariable("Expect variable name.");
 
     if(match(TOKEN_EQUAL)){
+    //         Value value;
+    // ObjString* stringName = copyString(name->start, name->length);
+    // if(!tableGet(&variables, stringName , &value)){
+    //     uint8_t constant = makeConstant(OBJ_VAL(stringName));
+    //     // agregar constante a la tabla de variables 
+    //     tableSet(&variables, stringName, NUMBER_VAL(constant));
+    //     return constant;
+    // } 
+
         expression();
     } else {
         emitByte(OP_NIL);
