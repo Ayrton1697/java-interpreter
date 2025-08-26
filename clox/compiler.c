@@ -120,10 +120,6 @@ static uint8_t makeConstant(Value value){
         error("Too many constants in one chunk.");
         return 0;
     }
-    // agregar constante a la tabla de variables 
-    // ESTO TIENE QUE IR EN OTRO LADO PORQUE ESTA FUNCION SE LLAMA PARA CUALQUIER TIPO DE CONSTANTES
-    tableSet(&variables, AS_STRING(value), NUMBER_VAL(constant));
-
     return (uint8_t)constant;
 }
 
@@ -151,9 +147,13 @@ static void parsePrecedence(Precedence precedence);
 static uint8_t identifierConstant(Token* name){
     // chequear que no exista la variable antes de agregarla a la tabla de constants!
     Value value;
-    if(!tableGet(&variables, name, &value)){
-        return makeConstant(OBJ_VAL(copyString(name->start, name->length)));
-    }
+    ObjString* stringName = copyString(name->start, name->length);
+    if(!tableGet(&variables, stringName , &value)){
+        uint8_t constant = makeConstant(OBJ_VAL(stringName));
+        // agregar constante a la tabla de variables 
+        tableSet(&variables, stringName, NUMBER_VAL(constant));
+        return constant;
+    } 
     return AS_NUMBER(value);
 }
 
