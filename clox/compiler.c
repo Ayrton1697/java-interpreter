@@ -17,6 +17,9 @@ typedef struct {
 } Parser;
 
 
+Table variables;
+
+
 typedef enum {
     PREC_NONE,
     PREC_ASSIGNMENT, // =
@@ -41,6 +44,7 @@ typedef struct {
 
 Parser parser;
 Chunk* compilingChunk;
+
 
 static Chunk* currentChunk(){
     return compilingChunk;
@@ -116,6 +120,10 @@ static uint8_t makeConstant(Value value){
         error("Too many constants in one chunk.");
         return 0;
     }
+    // agregar constante a la tabla de variables 
+    // ESTO TIENE QUE IR EN OTRO LADO PORQUE ESTA FUNCION SE LLAMA PARA CUALQUIER TIPO DE CONSTANTES
+    tableSet(&variables, AS_STRING(value), NUMBER_VAL(constant));
+
     return (uint8_t)constant;
 }
 
@@ -141,11 +149,17 @@ static ParseRule* getRule(TokenType type);
 static void parsePrecedence(Precedence precedence);
 
 static uint8_t identifierConstant(Token* name){
-    return makeConstant(OBJ_VAL(copyString(name->start, name->length)));
+    // chequear que no exista la variable antes de agregarla a la tabla de constants!
+    Value value;
+    if(!tableGet(&variables, name, &value)){
+        return makeConstant(OBJ_VAL(copyString(name->start, name->length)));
+    }
+    return AS_NUMBER(value);
 }
 
 static uint8_t parseVariable(const char* errorMessage){
     consume(TOKEN_IDENTIFIER, errorMessage);
+
     return identifierConstant(&parser.previous);
 }
 
@@ -367,6 +381,7 @@ static ParseRule* getRule(TokenType type){
 }
 
 bool compile(const char* source, Chunk* chunk){
+    initTable(&variables);
     initScanner(source);
     compilingChunk = chunk;
     parser.hadError = false;
@@ -388,6 +403,7 @@ bool compile(const char* source, Chunk* chunk){
     while(!match(TOKEN_EOF)){
         declaration();
     }
+    freeTable(&variables);
     endCompiler();
     return !parser.hadError;
 }
