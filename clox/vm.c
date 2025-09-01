@@ -116,9 +116,21 @@ static InterpretResult run(){
                 uint8_t slot = READ_BYTE();
                 push(vm.stack[slot]);    
                 break;
+            case OP_GET_LOCAL_LONG: 
+                uint8_t slotHigh = READ_BYTE();
+                uint8_t slotLow = READ_BYTE();
+                uint16_t combinedSlot = (uint16_t)(slotHigh << 8 | slotLow);
+                push(vm.stack[combinedSlot]);    
+                break;
             case OP_SET_LOCAL:
                 uint8_t slot = READ_BYTE();
                 vm.stack[slot] = peek(0);
+                break;
+            case OP_SET_LOCAL_LONG:
+                uint8_t slotHigh = READ_BYTE();
+                uint8_t slotLow = READ_BYTE();
+                uint16_t combinedSlot = (uint16_t)(slotHigh << 8 | slotLow);
+                vm.stack[combinedSlot] = peek(0);
                 break;
             case OP_GET_GLOBAL: {
                 ObjString* name = READ_STRING();
