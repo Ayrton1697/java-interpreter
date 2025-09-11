@@ -335,6 +335,44 @@ static void expressionStatement(){
     emitByte(OP_POP);
 }
 
+static void switchStatement(){
+    // switch (expression)
+    // {
+    // case test:
+    //     /* code */
+    //     break;
+    
+    // case test2:
+    //     /* code */
+    //     break;
+    
+    // default:
+    //     break;
+    // }
+    consume(TOKEN_LEFT_PAREN, "Expect '(' after switch.");
+    expression();
+    consume(TOKEN_RIGHT_PAREN, "Expect ')' after condition.");
+    consume(TOKEN_LEFT_BRACE, "Expect '{' after switch.");
+    int exitJump = -1;
+    while(!match(TOKEN_RIGHT_BRACE)){
+        consume(TOKEN_CASE, "Expect 'case' inside switch.");
+        expression();
+        emitByte(OP_EQUAL);
+        int nextJump = emitJump(OP_JUMP_IF_FALSE);
+        emitByte(OP_POP);
+        consume(TOKEN_COLON, "Expect ':' after case condition.");
+        statement();
+        int exitJump = emitJump(OP_JUMP);
+        patchJump(nextJump);
+    }
+
+    if(exitJump != -1){
+        patchJump(exitJump);
+    }
+
+    consume(TOKEN_RIGHT_BRACE, "Expect '}' after switch.");
+}
+
 static void forStatement(){
     beginScope();
     consume(TOKEN_LEFT_PAREN, "Expect '(' after for.");
@@ -455,6 +493,8 @@ static void declaration(){
 static void statement(){
     if(match(TOKEN_PRINT)){
         printStatement();
+    } else if(match(TOKEN_SWITCH)) {
+        switchStatement();
     } else if(match(TOKEN_FOR)) {
         forStatement();
     } else if(match(TOKEN_IF)) {
