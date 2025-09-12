@@ -355,11 +355,13 @@ static void switchStatement(){
     consume(TOKEN_LEFT_BRACE, "Expect '{' after switch.");
     int exitJump = -1;
     while(!match(TOKEN_RIGHT_BRACE)){
+        // hay que agregar un op code que duplique el valor en top of the stack para no eliminarlo 
+        // en el op_equal y poder seguir usandolo en la prox iteracion
         consume(TOKEN_CASE, "Expect 'case' inside switch.");
+        emitByte(OP_DUP);
         expression();
         emitByte(OP_EQUAL);
         int nextJump = emitJump(OP_JUMP_IF_FALSE);
-        emitByte(OP_POP);
         consume(TOKEN_COLON, "Expect ':' after case condition.");
         statement();
         int exitJump = emitJump(OP_JUMP);
