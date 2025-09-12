@@ -50,6 +50,8 @@ typedef struct {
     Local locals[UINT8_COUNT];
     int localCount;
     int scopeDepth;
+    int continueJump;
+    int loopDepth;
 } Compiler;
 
 Parser parser;
@@ -170,6 +172,7 @@ static void patchJump(int offset){
 static void initCompiler(Compiler* compiler){
     compiler->localCount = 0;
     compiler->scopeDepth = 0;
+    compiler->loopDepth = 0;
     current = compiler;
 }
 
@@ -377,6 +380,7 @@ static void switchStatement(){
 
 static void forStatement(){
     beginScope();
+    current->loopDepth+=1;
     consume(TOKEN_LEFT_PAREN, "Expect '(' after for.");
     
     if(match(TOKEN_SEMICOLON)){
@@ -400,10 +404,10 @@ static void forStatement(){
     if(!match(TOKEN_RIGHT_PAREN)){
         int bodyJump = emitJump(OP_JUMP);
         int incrementStart = currentChunk()->count;
+        current->continueJump = incrementStart;
         expression();
         emitByte(OP_POP);
         consume(TOKEN_RIGHT_PAREN, "Expect ')' after for clauses.");
-
         emitLoop(loopStart);
         loopStart = incrementStart;
         patchJump(bodyJump);
@@ -416,7 +420,17 @@ static void forStatement(){
         patchJump(exitJump);
         emitByte(OP_POP);
     }
+    current->loopDepth-=1;
     endScope();
+}
+
+static void continueStmt(){
+    if(current->loopDepth <= 0){
+        error("Cant use continue outside a loop.");
+    }
+    consume(TOKEN_SEMICOLON, "Expected semicolon after 'continue'.");
+    emitLoop(current->continueJump);
+    return;
 }
 
 static void ifStatement(){
@@ -445,6 +459,8 @@ static void printStatement(){
 
 static void whileStatement(){
     int loopStart = currentChunk()->count;
+    current->continueJump = loopStart;
+    current->loopDepth+=1;
     consume(TOKEN_LEFT_PAREN, "Expect '(' after 'while'.");
     expression();
     consume(TOKEN_RIGHT_PAREN,"Expect ')' after condition.");
@@ -456,6 +472,7 @@ static void whileStatement(){
 
     patchJump(exitJump);
     emitByte(OP_POP);
+    current->loopDepth-=1;
 }
 
 static void synchronize(){
@@ -507,6 +524,8 @@ static void statement(){
         beginScope();
         block();
         endScope();
+    } else if(match(TOKEN_CONTINUE)) {
+        continueStmt();
     } else {
         expressionStatement();
     }
