@@ -1,6 +1,8 @@
 #ifndef clox_vm_h
 #define clox_vm_h
 
+
+#include "object.h"
 #include "chunk.h"
 #include "table.h"
 #include "value.h"
