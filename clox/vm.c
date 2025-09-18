@@ -236,8 +236,9 @@ InterpretResult interpret(const char* source){
     frame->ip = function->chunk.code;
     frame->slots = vm.stack;
 
-    InterpretResult result = run();
+    // InterpretResult result = run();
 
-    freeChunk(&chunk);
-    return result;
+    // freeChunk(&chunk);
+    // return result;
+    return run();
 }
