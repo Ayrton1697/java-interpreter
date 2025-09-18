@@ -105,7 +105,7 @@ static InterpretResult run(){
                 printf(" ]");
             }
             print("\n");
-            dissasembleInstruction(vm.chunk, (int)(vm.ip - vm.chunk->code));
+            dissasembleInstruction(&frame->function->chunk, (int)(frame->ip - frame->function->chunk->code));
         #endif
         uint8_t instruction;
         switch (instruction = READ_BYTE()){
@@ -120,11 +120,11 @@ static InterpretResult run(){
             case OP_POP: pop(); break;
             case OP_GET_LOCAL: 
                 uint8_t slot = READ_BYTE();
-                push(vm.stack[slot]);    
+                push(frame->slots[slot]);    
                 break;
             case OP_SET_LOCAL:
                 uint8_t slot = READ_BYTE();
-                vm.stack[slot] = peek(0);
+                frame->slots[slot] = peek(0);
                 break;
             case OP_GET_GLOBAL: {
                 ObjString* name = READ_STRING();
@@ -190,17 +190,17 @@ static InterpretResult run(){
                 break;
             case OP_JUMP:{
                 uint16_t offset = READ_SHORT();
-                vm.ip += offset;
+                frame->ip += offset;
                 break;
             }
             case OP_JUMP_IF_FALSE:{
                 uint16_t offset = READ_SHORT();
-                if(isFalsey(peek(0))) vm.ip += offset;
+                if(isFalsey(peek(0))) frame->ip += offset;
                 break;
             }
             case OP_LOOP:{
                 uint16_t offset = READ_SHORT();
-                vm.ip -= offset;
+                frame->ip -= offset;
                 break;
             }
             case OP_RETURN:{
@@ -217,15 +217,24 @@ static InterpretResult run(){
 }
 
 InterpretResult interpret(const char* source){  
-    Chunk chunk;
-    initChunk(&chunk);
-    if(!compile(source, &chunk)){
-        freeChunk(&chunk);
-        return INTERPRET_COMPILE_ERROR;
-    }
+    // Chunk chunk;
+    // initChunk(&chunk);
+    // if(!compile(source, &chunk)){
+    //     freeChunk(&chunk);
+    //     return INTERPRET_COMPILE_ERROR;
+    // }
 
-    vm.chunk = &chunk;
-    vm.ip = vm.chunk->code;
+    // vm.chunk = &chunk;
+    // vm.ip = vm.chunk->code;
+
+    ObjFunction* function = compile(source);
+    if(function == NULL) return INTERPRET_COMPILE_ERROR;
+
+    push(OBJ_VAL(function));
+    CallFrame* frame = &vm.frames[vm.frameCount]++;
+    frame->function = function;
+    frame->ip = function->chunk.code;
+    frame->slots = vm.stack;
 
     InterpretResult result = run();
 

@@ -2,6 +2,7 @@
     "files.associations": {
         "scanner.h": "c",
         "compiler.h": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "typeinfo": "c"
     }
 }
