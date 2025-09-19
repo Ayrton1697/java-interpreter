@@ -230,6 +230,7 @@ static void addLocal(Token name){
     }
     Local* local = &current->locals[current->localCount++];
     local->name = name;
+    local->depth = -1;
     local->depth = current->scopeDepth;
 }
 
@@ -242,6 +243,9 @@ static int resolveLocal(Compiler* compiler,Token* name){
     for(int i = compiler->localCount - 1; i>=0; i--){
         Local* local = &compiler->locals[i];
         if(identifiersEqual(name, &local->name)){
+            if(local->depth = -1){
+                error("Cant read local variable in its own initializer.");
+            }
             return i;
         }
     }
@@ -275,8 +279,14 @@ static uint8_t parseVariable(const char* errorMessage){
     return identifierConstant(&parser.previous);
 }
 
+static void markInitialized(){
+    if(current->scopeDepth == 0) return;
+    current->locals[current->localCount - 1].depth = current->scopeDepth;
+}
+
 static void defineVariable(uint8_t global){
     if(current->scopeDepth > 0){
+        markInitialized();
         return;
     }
     emitBytes(OP_DEFINE_GLOBAL, global);
@@ -331,6 +341,13 @@ static void block(){
         declaration();
     }
     consume(TOKEN_RIGHT_BRACE, "Expect '}' after block.");
+}
+
+static void funDeclaration(){
+    uint8_t global = parseVariable("Expect function name.");
+    markInitialized();
+    function(TYPE_FUNCTION);
+    defineVariable(global);
 }
 
 static void varDeclaration(){
@@ -459,7 +476,10 @@ static void synchronize(){
 }
 
 static void declaration(){
-    if(match(TOKEN_VAR)){
+    if(match(TOKEN_FUN)){
+        funDeclaration();
+    }
+    else if(match(TOKEN_VAR)){
         varDeclaration();
     } else {
         statement();
