@@ -185,6 +185,9 @@ static void initCompiler(Compiler* compiler, FunctionType type){
     compiler->function = newFunction();
     current = compiler;
 
+    if(type != TYPE_SCRIPT){
+        current->function->name = copyString(parser.previous.start, parser.previous.length);
+    }
     Local* local = &current->locals[current->localCount++];
     local->depth = 0;
     local->name.start = "";
@@ -296,6 +299,18 @@ static void defineVariable(uint8_t global){
     emitBytes(OP_DEFINE_GLOBAL, global);
 }
 
+static uint8_t argumentList(){
+    uint8_t argCount = 0;
+    if(!check(TOKEN_RIGHT_PAREN)){
+        do {
+            expression();
+            argCount++;
+        } while (match(TOKEN_COMMA));
+    }
+    consume(TOKEN_RIGHT_PAREN, "Expect ')' after arguments.");
+    return argCount;
+}
+
 static void and_(bool canAssign){
     int endJump = emitJump(OP_JUMP_IF_FALSE);
 
@@ -327,6 +342,11 @@ static void binary(bool canAssign){
     }
 }
 
+static void call(bool canAssign){
+    uint8_t argCount = argumentList();
+    emitBytes(OP_CALL, argCount);
+}
+
 static void literal(bool canAssign){
     switch(parser.previous.type){
         case TOKEN_FALSE: emitByte(OP_FALSE); break;
@@ -353,6 +373,16 @@ static void function(FunctionType type){
     beginScope();
 
     consume(TOKEN_LEFT_PAREN, "Expect '(' after function name.");
+    if(!check(TOKEN_RIGHT_PAREN)){
+        do {
+            current->function->arity++;
+            if(current->function->arity > 255){
+                errorAtCurrent("Can´t have more than 255 parameters.");
+            }
+            uint8_t constant = parseVariable("Expect parameter name.");
+            defineVariable(constant);
+        } while(match(TOKEN_COMMA));
+    }
     consume(TOKEN_RIGHT_PAREN, "Expect ')' after parameters.");
     consume(TOKEN_LEFT_BRACE, "Expect '{' before function body.");
     block();
@@ -590,7 +620,7 @@ static void unary(bool canAssign){
 }
 
 ParseRule rules[] = {
-    [TOKEN_LEFT_PAREN] = {grouping, NULL, PREC_NONE},
+    [TOKEN_LEFT_PAREN] = {grouping, call, PREC_CALL},
     [TOKEN_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
     [TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE},
     [TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE},
