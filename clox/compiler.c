@@ -46,7 +46,7 @@ typedef struct {
     int depth;
 } Local;
 
-typedef struct{
+typedef enum{
     TYPE_FUNCTION,
     TYPE_SCRIPT
 } FunctionType;
@@ -60,7 +60,7 @@ typedef struct Compiler{
     Local locals[UINT8_COUNT];
     int localCount;
     int scopeDepth;
-};
+} Compiler; 
 
 Parser parser;
 Compiler* current = NULL;
@@ -148,6 +148,7 @@ static int emitJump(uint8_t instruction){
 }
 
 static void emitReturn(){
+    emitByte(OP_NIL);
     emitByte(OP_RETURN);
 }
 
