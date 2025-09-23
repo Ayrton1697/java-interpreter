@@ -58,6 +58,20 @@ static Value peek(int distance){
     return vm.stackTop[-1 - distance];
 }
 
+static bool callValue(Value callee, int argCount){
+    if(IS_OBJ(callee)){
+        switch (OBJ_TYPE(callee))
+        {
+        case OBJ_FUNCTION:
+            return call(AS_FUNCTION(callee), argCount);
+        default:
+            break;
+        }
+    }
+    runtimeError("Can only call functions and classes.");
+    return false;
+}
+
 static bool isFalsey(Value value){
     return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
 }
@@ -202,6 +216,14 @@ static InterpretResult run(){
             case OP_LOOP:{
                 uint16_t offset = READ_SHORT();
                 frame->ip -= offset;
+                break;
+            }
+            case OP_CALL:{
+                int argCount = READ_BYTE();
+                if(!callValue(peek(argCount), argCount)){
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                frame = &vm.frames[vm.frameCount - 1];
                 break;
             }
             case OP_RETURN:{
