@@ -483,7 +483,17 @@ static void ifStatement(){
     patchJump(elseJump);
 }
 
-static void printStatement(){
+static void printStatement() {
+  expression();
+  consume(TOKEN_SEMICOLON, "Expect ';' after value.");
+  emitByte(OP_PRINT);
+}
+
+static void returnStatement(){
+    if(current->type == TYPE_SCRIPT){
+        error("Can´t return from top-level code.");
+    }
+
     if(match(TOKEN_SEMICOLON)){
         emitReturn();
     } else {
@@ -493,11 +503,6 @@ static void printStatement(){
     }
 }
 
-static void returnStatement(){
-    expression();
-    consume(TOKEN_SEMICOLON, "Expect ';' after value");
-    emitByte(OP_RETURN);
-}
 
 static void whileStatement(){
     int loopStart = currentChunk()->count;
