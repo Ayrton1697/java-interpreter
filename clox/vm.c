@@ -141,11 +141,11 @@ static void concatenate(){
 static InterpretResult run(){
 
     CallFrame* frame = &vm.frames[vm.frameCount - 1];
-
-    #define READ_BYTE() (*frame->ip++)
+    uint8_t* ip = frame->ip;
+    #define READ_BYTE() (*ip++)
     #define READ_CONSTANT() (frame->function->chunk.constants.values[READ_BYTE()])
     #define READ_SHORT() \
-        (frame->ip +=2, (uint16_t)((frame->ip[-2] << 8) | frame->ip[-1]))
+        (ip +=2, (uint16_t)((ip[-2] << 8) | ip[-1]))
     #define READ_STRING() AS_STRING(READ_CONSTANT())
     #define BINARY_OP(valueType,op) \
         do { \
@@ -168,7 +168,7 @@ static InterpretResult run(){
                 printf(" ]");
             }
             print("\n");
-            dissasembleInstruction(&frame->function->chunk, (int)(frame->ip - frame->function->chunk->code));
+            dissasembleInstruction(&frame->function->chunk, (int)(ip - frame->function->chunk->code));
         #endif
         uint8_t instruction;
         switch (instruction = READ_BYTE()){
@@ -268,10 +268,12 @@ static InterpretResult run(){
             }
             case OP_CALL:{
                 int argCount = READ_BYTE();
+                frame->ip = ip;
                 if(!callValue(peek(argCount), argCount)){
                     return INTERPRET_RUNTIME_ERROR;
                 }
                 frame = &vm.frames[vm.frameCount - 1];
+                ip = frame->ip;
                 break;
             }
             case OP_RETURN:{
@@ -285,6 +287,7 @@ static InterpretResult run(){
                 vm.stackTop = frame->slots;
                 push(result);
                 frame = &vm.frames[vm.frameCount - 1];
+                ip = frame->ip;
                 break;
             }
         
