@@ -141,7 +141,7 @@ static void concatenate(){
 static InterpretResult run(){
 
     CallFrame* frame = &vm.frames[vm.frameCount - 1];
-    uint8_t* ip = frame->ip;
+    register uint8_t* ip = frame->ip;
     #define READ_BYTE() (*ip++)
     #define READ_CONSTANT() (frame->function->chunk.constants.values[READ_BYTE()])
     #define READ_SHORT() \
@@ -253,17 +253,17 @@ static InterpretResult run(){
                 break;
             case OP_JUMP:{
                 uint16_t offset = READ_SHORT();
-                frame->ip += offset;
+                ip += offset;
                 break;
             }
             case OP_JUMP_IF_FALSE:{
                 uint16_t offset = READ_SHORT();
-                if(isFalsey(peek(0))) frame->ip += offset;
+                if(isFalsey(peek(0))) ip += offset;
                 break;
             }
             case OP_LOOP:{
                 uint16_t offset = READ_SHORT();
-                frame->ip -= offset;
+                ip -= offset;
                 break;
             }
             case OP_CALL:{
