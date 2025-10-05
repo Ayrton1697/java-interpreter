@@ -11,7 +11,10 @@
 
 VM vm;
 
+static bool hadError = false;
+
 static Value clockNative(int argCount, Value* args){
+    // if(error) runtimeError("An error occurred."); IMPLEMENTAR SEGUN CADA FUNCION
     return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
 }
 
@@ -22,6 +25,7 @@ static void resetStack(){
 
 static void runtimeError(const char* format, ...){
     // entender
+    hadError = true;
     va_list args;
     va_start(args,format);
     vfprintf(stderr,format,args);
@@ -113,6 +117,9 @@ static bool callValue(Value callee, int argCount){
                 return false;
             }
             Value result = native(argCount, vm.stackTop - argCount);
+            if(hadError){
+                return false;
+            }
             vm.stackTop -= argCount + 1;
             push(result);
             return true;
