@@ -46,6 +46,11 @@ typedef struct {
     int depth;
 } Local;
 
+typedef struct{
+    uint8_t index;
+    bool isLocal;
+} Upvalue;
+
 typedef enum{
     TYPE_FUNCTION,
     TYPE_SCRIPT
@@ -59,6 +64,7 @@ typedef struct Compiler{
 
     Local locals[UINT8_COUNT];
     int localCount;
+    Upvalue upvalues[UINT8_COUNT];
     int scopeDepth;
 } Compiler; 
 
@@ -263,6 +269,17 @@ static int resolveLocal(Compiler* compiler,Token* name){
 static int addUpvalue(Compiler* compiler, uint8_t index,
                     bool isLocal){
     int upvalueCount = compiler->function->upvalueCount;
+
+    for(int i = 0; i < upvalueCount; i++){
+        Upvalue* upvalue = &compiler->upvalues[i];
+        if(upvalue->index == index && upvalue->isLocal == isLocal){
+            return i;
+        }
+    }
+    if(upvalueCount == UINT8_COUNT){
+        error("Too many closure variables in function.");
+        return 0;
+    }
     compiler->upvalues[upvalueCount].isLocal = isLocal;
     compiler->upvalues[upvalueCount].index = index;
     return compiler->function->upvalueCount++;
