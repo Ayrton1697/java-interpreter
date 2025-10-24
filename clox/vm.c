@@ -18,6 +18,7 @@ static Value clockNative(int argCount, Value* args){
 static void resetStack(){
     vm.stackTop = vm.stack;
     vm.frameCount = 0;
+    vm.openUpvalues = NULL;
 }
 
 static void runtimeError(const char* format, ...){
