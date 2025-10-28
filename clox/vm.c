@@ -82,11 +82,21 @@ static Value peek(int distance){
     return vm.stackTop[-1 - distance];
 }
 
-static bool call(ObjClosure* closure, int argCount){
+static bool call(Value callable, int argCount){
 
-    if(closure->function->arity != argCount){
+    ObjFunction* function;
+    ObjClosure* closure = NULL;
+
+    if(IS_FUNCTION(callable)){
+        function = AS_FUNCTION(callable);
+    } else if(IS_CLOSURE(callable)){
+        closure = AS_CLOSURE(callable);
+        function = closure->function;
+    }
+
+    if(function->arity != argCount){
         runtimeError("Expected %d arguments but got %d.",
-            closure->function->arity,argCount);
+            function->arity,argCount);
         return false;
     }
 
@@ -95,8 +105,9 @@ static bool call(ObjClosure* closure, int argCount){
         return false;
     }
     CallFrame* frame = &vm.frames[vm.frameCount++];
+    frame->function = function;
     frame->closure = closure;
-    frame->ip = closure->function->chunk.code;
+    frame->ip = function->chunk.code;
     frame->slots = vm.stackTop - argCount - 1;
     return true;
 }
@@ -105,8 +116,11 @@ static bool callValue(Value callee, int argCount){
     if(IS_OBJ(callee)){
         switch (OBJ_TYPE(callee))
         {
+        case OBJ_FUNCTION:
+            return call(callee, argCount);
+            break;
         case OBJ_CLOSURE:
-            return call(AS_CLOSURE(callee), argCount);
+            return call(callee, argCount);
         case OBJ_NATIVE:
             NativeFn native = AS_NATIVE(callee);
             Value result = native(argCount, vm.stackTop - argCount);
@@ -375,11 +389,11 @@ InterpretResult interpret(const char* source){
     // vm.chunk = &chunk;
     // vm.ip = vm.chunk->code;
 
-    ObjClosure* closure = compile(source);
-    if(closure == NULL) return INTERPRET_COMPILE_ERROR;
+    ObjFunction* function = compile(source);
+    if(function == NULL) return INTERPRET_COMPILE_ERROR;
 
-    push(OBJ_VAL(closure));
-    call(closure, 0);
+    push(OBJ_VAL(function));
+    call(OBJ_VAL(function), 0);
 
     // InterpretResult result = run();
 
