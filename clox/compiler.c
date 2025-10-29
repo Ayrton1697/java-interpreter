@@ -481,6 +481,10 @@ static void expressionStatement(){
 }
 
 static void forStatement(){
+
+    bool varDecl = false;
+    Token varName;
+
     beginScope();
     consume(TOKEN_LEFT_PAREN, "Expect '(' after for.");
     
@@ -488,6 +492,8 @@ static void forStatement(){
 
     } else if (match(TOKEN_VAR)){
         varDeclaration();
+        varName = current->locals[current->localCount - 1].name;
+
     } else {
         expressionStatement();
     }
@@ -514,7 +520,19 @@ static void forStatement(){
         patchJump(bodyJump);
     }
 
+    if(varDecl){
+        beginScope();
+        namedVariable(varName,false);
+        addLocal(varName);
+        markInitialized(varName);
+    }
+
     statement();
+
+    if(varDecl){
+        endScope();
+    }
+    
     emitLoop(loopStart);
 
     if(exitJump != -1){
