@@ -3,6 +3,7 @@
         "scanner.h": "c",
         "compiler.h": "c",
         "type_traits": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "memory.h": "c"
     }
 }
