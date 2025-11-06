@@ -30,7 +30,7 @@ static void runtimeError(const char* format, ...){
     fputs("\n",stderr);
 
 
-    for(int i = vm.frameCount - 1; i>=0, i--;){
+    for(int i = vm.frameCount - 1; i>=0; i--){
         CallFrame* frame = &vm.frames[i];
         ObjFunction* function = frame->closure->function;
         size_t instruction = frame->ip - function->chunk.code - 1;
@@ -167,8 +167,8 @@ static bool isFalsey(Value value){
 }
 
 static void concatenate(){
-    ObjString* b = AS_STRING(pop());
-    ObjString* a = AS_STRING(pop());
+    ObjString* b = AS_STRING(peek(0));
+    ObjString* a = AS_STRING(peek(1));
     int length = a->length + b->length;
     char* chars = ALLOCATE(char, length + 1);
     memcpy(chars, a->chars, a->length);
@@ -176,6 +176,8 @@ static void concatenate(){
     chars[length] = '\0';
 
     ObjString* result = takeString(chars,length);
+    pop();
+    pop();
     push(OBJ_VAL(result));
 
 }
@@ -223,14 +225,16 @@ static InterpretResult run(){
             case OP_TRUE: push(BOOL_VAL(true)); break;
             case OP_FALSE: push(BOOL_VAL(false)); break;
             case OP_POP: pop(); break;
-            case OP_GET_LOCAL: 
+            case OP_GET_LOCAL: {
                 uint8_t slot = READ_BYTE();
                 push(frame->slots[slot]);    
                 break;
-            case OP_SET_LOCAL:
+            }
+            case OP_SET_LOCAL: {
                 uint8_t slot = READ_BYTE();
                 frame->slots[slot] = peek(0);
                 break;
+            }
             case OP_GET_GLOBAL: {
                 ObjString* name = READ_STRING();
                 Value value;
@@ -381,9 +385,12 @@ InterpretResult interpret(const char* source){
     // vm.chunk = &chunk;
     // vm.ip = vm.chunk->code;
 
-    ObjClosure* closure = compile(source);
-    if(closure == NULL) return INTERPRET_COMPILE_ERROR;
+    ObjFunction* function = compile(source);
+    if(function == NULL) return INTERPRET_COMPILE_ERROR;
+    push(OBJ_VAL(function));
 
+    ObjClosure* closure = newClosure(function);
+    pop();
     push(OBJ_VAL(closure));
     call(closure, 0);
 

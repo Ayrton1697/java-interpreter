@@ -60,7 +60,7 @@ typedef struct ObjUpvalue{
     Obj obj;
     Value* location;
     Value closed;
-    ObjUpvalue* next;
+    struct ObjUpvalue* next;
 } ObjUpvalue;
 
 typedef struct {

@@ -1,4 +1,8 @@
-var breakfast = "huevo"; 
-var caca = "leche"; 
-breakfast = "caca con " + caca; 
+var breakfast = "huevo";
+var test;
+var caca = "leche";
+breakfast = "caca con " + caca;
 print breakfast;
+
+print "finish";
+
