@@ -52,8 +52,10 @@ static void defineNative(const char* name, NativeFn function){
     pop();
 }
 
+
 void initVM(){
     resetStack();
+
     vm.objects = NULL;
     vm.bytesAllocated = 0;
     vm.nextGC = 1024 * 1024;

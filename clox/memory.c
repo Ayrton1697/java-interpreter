@@ -10,6 +10,11 @@
 #endif
 
 #define GC_HEAP_GROW_FACTOR 2
+#define HEAP_SIZE (1024*1024)
+
+void* from_space = NULL;
+void* to_space = NULL;
+void* alloc_ptr = NULL;
 
 void* reallocate(void* pointer, size_t oldSize, size_t newSize){
     vm.bytesAllocated += newSize - oldSize;
@@ -205,4 +210,38 @@ void freeObjects(){
     }
 
     free(vm.grayStack);
+}
+
+void initHeaps(){
+    from_space = malloc(HEAP_SIZE);
+    to_space = malloc(HEAP_SIZE);
+
+    if(from_space == NULL || to_space == NULL){
+        fprintf(stderr,"Failed to allocate heaps!\n");
+        exit(1);
+    }
+    alloc_ptr = from_space;
+}
+
+void* alloc_ptr;
+
+void* triggerCollection(){
+    // pause vm execution
+    // go through list of roots and mark
+    // move all reachable items to new heap
+    // remove all items from old heap
+
+}
+
+void* gcAllocator(size_t size) {
+
+    void* new_alloc_ptr = (char*)alloc_ptr + size;
+    void* end_of_heap =  (char*)from_space + HEAP_SIZE;
+
+    if(new_alloc_ptr >= end_of_heap){
+        triggerCollection();
+    }
+    void* user_ptr = alloc_ptr;
+    alloc_ptr = (char*)alloc_ptr + size;
+    return user_ptr;
 }
