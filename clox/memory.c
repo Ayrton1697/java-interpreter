@@ -225,10 +225,50 @@ void initHeaps(){
 
 void* alloc_ptr;
 
+// copies value from FROM HEAP to TO HEAP
+Value copyValue(Value val){
+    if (!IS_OBJ(val)) { // Assuming you have a macro like this
+        return val;
+    }
+    // check if its not already on to_Heap
+    Obj* obj = AS_OBJ(val);
+    if((char*)from_space + HEAP_SIZE >= obj >= (char*)from_space ){
+
+    }
+    void* to_ptr = memcpy(to_ptr,value->startPointer, sizeof(val));
+    return (Value)*to_ptr;
+}
+
+static void markRootsnewGC(){
+    // stack roots
+    for(Value* slot = vm.stack; slot < vm.stackTop; slot++){
+        // markValue(*slot);
+        *slot = copyValue(*slot);
+    }
+    // vm frames roots
+    for(int i = 0; i <= vm.frameCount; i++){
+        ObjClosure* closure = vm.frames[i].closure;
+        markObject((Obj*)closure);
+    }
+    // los upvalues
+    for(ObjUpvalue* upvalue = vm.openUpvalues;
+        upvalue != NULL;
+        upvalue = upvalue->next){
+            markObject((Obj*)upvalue);
+    }
+    // vm global variable roots
+    markTable(&vm.globals);
+    markCompilerRoots();
+}
+
 void* triggerCollection(){
     // pause vm execution
+
     // go through list of roots and mark
+    markRootsnewGC();
+    
     // move all reachable items to new heap
+    
     // remove all items from old heap
 
 }
