@@ -224,6 +224,24 @@ void initHeaps(){
 }
 
 void* alloc_ptr;
+extern void* to_alloc_ptr;
+
+size_t get_object_size(Obj* obj);
+
+Value copy_and_forward(Obj* obj){
+
+    // copy its data to that pointer
+    size_t size = get_object_size(obj);
+    void* og_address = obj;
+    to_alloc_ptr = (char*)to_alloc_ptr + size;
+    void* new_address = memcpy(to_alloc_ptr, obj, size);
+
+    ForwardingPtr* tombstone = (ForwardingPtr*)og_address;
+    tombstone->new_address = new_address;
+    tombstone->type = OBJ_FORWARDED;
+    // return updated pointer
+    return OBJ_VAL(new_address);
+}
 
 // copies value from FROM HEAP to TO HEAP
 Value copyValue(Value val){
@@ -232,12 +250,21 @@ Value copyValue(Value val){
     }
     // check if its not already on to_Heap
     Obj* obj = AS_OBJ(val);
-    if((char*)from_space + HEAP_SIZE >= obj >= (char*)from_space ){
-
+    void* heap_end = (char*)from_space + HEAP_SIZE;
+    if((void*)obj >= from_space && (void*)obj < heap_end ){
+        if(obj->type == OBJ_FORWARDED){
+            ForwardingPtr* tombstone = (ForwardingPtr*)obj;
+            return OBJ_VAL(tombstone->new_address);
+        } else {
+            copy_and_forward(obj);
+        }
+    } else {
+        void* to_ptr = memcpy(to_ptr,value->startPointer, sizeof(val));
+        return (Value)*to_ptr;
     }
-    void* to_ptr = memcpy(to_ptr,value->startPointer, sizeof(val));
-    return (Value)*to_ptr;
+
 }
+
 
 static void markRootsnewGC(){
     // stack roots

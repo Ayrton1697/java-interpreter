@@ -26,7 +26,14 @@ typedef enum {
     OBJ_NATIVE,
     OBJ_STRING,
     OBJ_UPVALUE,
+    OBJ_FORWARDED,
 } ObjType;
+
+
+typedef struct {
+    ObjType type;
+    void* new_address;
+} ForwardingPtr;
 
 struct Obj {
     ObjType type;

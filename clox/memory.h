@@ -26,5 +26,7 @@ void collectGarbage();
 void* initHeaps();
 void* gcAllocator(size_t size);
 void* triggerCollection();
+size_t get_object_size(Obj* obj);
+Value copy_and_forward(Obj* obj);
 void freeObjects();
 #endif
