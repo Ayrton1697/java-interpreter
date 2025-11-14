@@ -270,6 +270,33 @@ Value copy_and_forward(Obj* obj){
     return OBJ_VAL(new_address);
 }
 
+static void scanObject(Obj* obj){
+   switch (obj->type)
+    {
+    case OBJ_STRING: 
+        break;
+    case OBJ_FUNCTION:
+        ObjFunction* function = (ObjFunction*)obj;
+        
+        // move name from FROM HEAP to TO HEAP
+        Value new_name_address = copyValue(OBJ_VAL(function->name)); 
+        function->name = AS_OBJ(new_name_address); 
+        break;
+    case OBJ_CLOSURE:   
+        ObjClosure* closure = (ObjClosure*)obj; 
+        break;
+    case OBJ_UPVALUE: 
+        break;
+    case OBJ_NATIVE:
+        break;
+    case OBJ_FORWARDED:;
+        break;
+    default:
+        fprintf(stderr, "Error: Unknown object type in GC!\n");
+        exit(1);
+    }
+}
+
 // copies value from FROM HEAP to TO HEAP
 Value copyValue(Value val){
     if (!IS_OBJ(val)) { // Assuming you have a macro like this
@@ -284,10 +311,11 @@ Value copyValue(Value val){
             return OBJ_VAL(tombstone->new_address);
         } else {
             copy_and_forward(obj);
+            scanObject(obj);
         }
     } else {
         void* to_ptr = memcpy(to_ptr,value->startPointer, sizeof(val));
-        return (Value)*to_ptr;
+        return OBJ_VAL(void*);
     }
 
 }
