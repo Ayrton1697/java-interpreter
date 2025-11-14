@@ -281,6 +281,14 @@ static void scanObject(Obj* obj){
         // move name from FROM HEAP to TO HEAP
         Value new_name_address = copyValue(OBJ_VAL(function->name)); 
         function->name = AS_OBJ(new_name_address); 
+        
+        // Chunk chunk = (Chunk)function->chunk->constants;
+        ValueArray constants = function->chunk.constants;
+        for(int i = 0; i < constants.count; i++){
+            Value value = copyValue((Value)constants.values[i]); 
+            constants.values[i] = value;
+        }
+
         break;
     case OBJ_CLOSURE:   
         ObjClosure* closure = (ObjClosure*)obj; 
