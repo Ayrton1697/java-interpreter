@@ -226,7 +226,34 @@ void initHeaps(){
 void* alloc_ptr;
 extern void* to_alloc_ptr;
 
-size_t get_object_size(Obj* obj);
+size_t get_object_size(Obj* obj){
+    switch (obj->type)
+    {
+    case OBJ_STRING:
+        return sizeof(OBJ_STRING) + ((ObjString*)obj)->length + 1; 
+        break;
+    case OBJ_FUNCTION:
+        return sizeof(ObjFunction); 
+        break;
+    case OBJ_CLOSURE:
+        ObjClosure* closure = (ObjClosure*)obj;
+        return sizeof(ObjClosure) + (sizeof(ObjUpvalue*) * closure->upvalueCount); 
+        break;
+    case OBJ_UPVALUE:
+        return sizeof(ObjUpvalue); 
+        break;
+    case OBJ_NATIVE:
+        return sizeof(ObjNative); 
+        break;
+    case OBJ_FORWARDED:
+        return;
+        break;
+    default:
+        fprintf(stderr, "Error: Unknown object type in GC!\n");
+        exit(1);
+    }
+
+}
 
 Value copy_and_forward(Obj* obj){
 
