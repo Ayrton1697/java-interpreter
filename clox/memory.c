@@ -285,15 +285,29 @@ static void scanObject(Obj* obj){
         // Chunk chunk = (Chunk)function->chunk->constants;
         ValueArray constants = function->chunk.constants;
         for(int i = 0; i < constants.count; i++){
-            Value value = copyValue((Value)constants.values[i]); 
-            constants.values[i] = value;
+            constants.values[i] = copyValue((Value)constants.values[i]); 
         }
 
         break;
-    case OBJ_CLOSURE:   
+    case OBJ_CLOSURE:  
         ObjClosure* closure = (ObjClosure*)obj; 
+        closure->function = (ObjFunction*)AS_OBJ(
+            copyValue(OBJ_VAL(closure->function))
+        );
+    
+        ObjUpvalue** upvalues = closure->upvalues;
+        for(int i = 0; i < closure->upvalueCount; i++){
+            ObjUpvalue* upvalue = upvalues[i];
+           closure->upvalues[i] = (ObjUpvalue*)AS_OBJ(
+            copyValue(OBJ_VAL(upvalue))
+            );
+        }
+
         break;
     case OBJ_UPVALUE: 
+        ObjUpvalue* upvalue = (ObjUpvalue*)obj;
+        upvalue->closed = copyValue(upvalue->closed);
+        upvalue->next = (ObjUpvalue*)AS_OBJ(copyValue(OBJ_VAL(upvalue->next)));
         break;
     case OBJ_NATIVE:
         break;
