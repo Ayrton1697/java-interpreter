@@ -332,18 +332,18 @@ Value copyValue(Value val){
             ForwardingPtr* tombstone = (ForwardingPtr*)obj;
             return OBJ_VAL(tombstone->new_address);
         } else {
-            copy_and_forward(obj);
-            scanObject(obj);
+            return copy_and_forward(obj);
+            // scanObject(obj);
         }
     } else {
-        void* to_ptr = memcpy(to_ptr,value->startPointer, sizeof(val));
-        return OBJ_VAL(void*);
+        fprintf(stderr, "Already copied!\n");
+        return val;
     }
 
 }
 
 
-static void markRootsnewGC(){
+static void markAndCopyRootsnewGC(){
     // stack roots
     for(Value* slot = vm.stack; slot < vm.stackTop; slot++){
         // markValue(*slot);
@@ -367,14 +367,21 @@ static void markRootsnewGC(){
 
 void* triggerCollection(){
     // pause vm execution
-
+    to_alloc_ptr = to_space;
+    void* scan_ptr = to_space;
     // go through list of roots and mark
-    markRootsnewGC();
-    
     // move all reachable items to new heap
+    markAndCopyRootsnewGC();
     
-    // remove all items from old heap
+    // scanear todas las referencias a otros objetos en los obj marcados
+    while(scan_ptr < to_alloc_ptr){
+        Obj* obj_to_scan = (Obj*)scan_ptr;
+        scanObject(obj_to_scan);
+        size_t obj_size = get_object_size(obj_to_scan);
+        scan_ptr+=obj_size;
+    }
 
+    // borrar items no marcados de from_heap
 }
 
 void* gcAllocator(size_t size) {
