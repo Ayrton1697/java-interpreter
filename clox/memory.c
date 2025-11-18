@@ -221,6 +221,7 @@ void initHeaps(){
         exit(1);
     }
     alloc_ptr = from_space;
+    to_alloc_ptr = to_space;
 }
 
 void* alloc_ptr;
@@ -246,7 +247,7 @@ size_t get_object_size(Obj* obj){
         return sizeof(ObjNative); 
         break;
     case OBJ_FORWARDED:
-        return;
+        return sizeof(ForwardingPtr);
         break;
     default:
         fprintf(stderr, "Error: Unknown object type in GC!\n");
@@ -260,8 +261,9 @@ Value copy_and_forward(Obj* obj){
     // copy its data to that pointer
     size_t size = get_object_size(obj);
     void* og_address = obj;
-    to_alloc_ptr = (char*)to_alloc_ptr + size;
+    
     void* new_address = memcpy(to_alloc_ptr, obj, size);
+    to_alloc_ptr = (char*)to_alloc_ptr + size;
 
     ForwardingPtr* tombstone = (ForwardingPtr*)og_address;
     tombstone->new_address = new_address;
@@ -382,6 +384,13 @@ void* triggerCollection(){
     }
 
     // borrar items no marcados de from_heap
+
+    // mover heaps entre si
+    void* temp = from_space;
+    from_space = to_space;
+    to_space = temp;
+    alloc_ptr = to_alloc_ptr;
+    
 }
 
 void* gcAllocator(size_t size) {
