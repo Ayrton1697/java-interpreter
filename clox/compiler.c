@@ -597,7 +597,10 @@ static void synchronize(){
 }
 
 static void declaration(){
-    if(match(TOKEN_FUN)){
+    if(match(TOKEN_CLASS)){
+        classDeclaration();
+    }
+    else if(match(TOKEN_FUN)){
         funDeclaration();
     }
     else if(match(TOKEN_VAR)){
