@@ -123,6 +123,8 @@ int dissasembleInstruction(Chunk* chunk, int offset){
         return simpleInstruction("OP_CLOSE_UPVALUE",offset);
     case OP_RETURN:
         return simpleInstruction("OP_PRINT", offset);
+    case OP_CLASS:
+        return constantInstruction("OP_CLASS", chunk,  offset);
     default:
         printf("Unknown opcode %d\n", instruction);
         return offset +1;
