@@ -137,6 +137,9 @@ void printObject(Value value){
     case OBJ_FUNCTION:
         printFunction(AS_FUNCTION(value));
         break;
+    case OBJ_INSTANCE:
+        printf("%s instance", AS_INSTANCE(value)->klass->name->chars);
+        break;
     case OBJ_NATIVE:
         printf("<native fn>");
         break;
