@@ -104,6 +104,11 @@ static void freeObject(Obj* object){
         printf("%p free type %d\n", (void*)object, object->type);
     #endif
     switch(object->type){
+        case OBJ_INSTANCE:
+            ObjInstance* instance = (ObjInstance*)object;
+            freeTable(&instance->fields);
+            FREE(ObjInstance, object);
+            break;
         case OBJ_NATIVE:
             FREE(ObjNative, object);
             break;
