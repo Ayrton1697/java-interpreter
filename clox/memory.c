@@ -90,6 +90,12 @@ void blackenObject(Obj* object){
         markArray(&function->chunk.constants);
         break;
     }
+    case OBJ_INSTANCE:{
+        ObjInstance* instance = (ObjInstance*)object;
+        markObject((Obj*)instance->klass);
+        markArray(&instance->fields);
+        break;
+    }
     case OBJ_UPVALUE:
         markValue(((ObjUpvalue*)object)->closed);
         break;
