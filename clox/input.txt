@@ -1,8 +1,10 @@
-var breakfast = "huevo";
-var test;
-var caca = "leche";
-breakfast = "caca con " + caca;
-print breakfast;
 
-print "finish";
+class Pair {}
+var pair = Pair();
+pair.first = 3.5;
+pair.second = 56;
+print Pair;
+print pair.second;
+print pair.first;
 
+print pair.first*3 + pair.second;

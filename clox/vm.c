@@ -291,6 +291,19 @@ static InterpretResult run(){
                 runtimeError("Undefined property '%s'.", name->chars);
                 return INTERPRET_RUNTIME_ERROR;
             }
+            case OP_SET_PROPERTY:{
+                if(!IS_INSTANCE(peek(1))){
+                    runtimeError("Can only set properties on instances.");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                ObjInstance* instance = AS_INSTANCE(peek(1));
+                tableSet(&instance->fields, READ_STRING(), peek(0));
+                Value value = pop();
+                pop();
+                push(value);
+                break;
+
+            }
             case OP_EQUAL: {
                 Value b = pop();
                 Value a = pop();

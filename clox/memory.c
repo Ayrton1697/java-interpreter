@@ -93,7 +93,7 @@ void blackenObject(Obj* object){
     case OBJ_INSTANCE:{
         ObjInstance* instance = (ObjInstance*)object;
         markObject((Obj*)instance->klass);
-        markArray(&instance->fields);
+        markTable(&instance->fields);
         break;
     }
     case OBJ_UPVALUE:
