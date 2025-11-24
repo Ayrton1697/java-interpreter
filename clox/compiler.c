@@ -400,10 +400,23 @@ static void call(bool canAssign){
     emitBytes(OP_CALL, argCount);
 }
 
+static void bracketExpression(bool canAssign){
+    // consume(TOKEN_LEFT_BRACKET, "Expect opening bracket.");
+    expression();
+    consume(TOKEN_RIGHT_BRACKET, "Expect closing bracket after expression.");
+    if(canAssign && match(TOKEN_EQUAL)){
+        expression();
+        emitByte(OP_SET_INDEX);
+    } else {
+        emitByte(OP_GET_INDEX);
+    }
+}
+
 static void dot(bool canAssign){
+
     consume(TOKEN_IDENTIFIER, "Expect property name afer '.'.");
     uint8_t name = identifierConstant(&parser.previous);
-
+ 
     if(canAssign && match(TOKEN_EQUAL)){
         expression();
         emitBytes(OP_SET_PROPERTY, name);
@@ -729,7 +742,8 @@ ParseRule rules[] = {
     [TOKEN_LEFT_PAREN] = {grouping, call, PREC_CALL},
     [TOKEN_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
     [TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE},
-    [TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE},
+    [TOKEN_RIGHT_BRACE] = {NULL, NULL, PREC_NONE},
+    [TOKEN_LEFT_BRACKET] = {NULL, bracketExpression, PREC_CALL},
     [TOKEN_COMMA] = {NULL, NULL, PREC_NONE},
     [TOKEN_DOT] = {NULL, dot, PREC_CALL},
     [TOKEN_MINUS] = {unary, binary, PREC_TERM},

@@ -275,6 +275,40 @@ static InterpretResult run(){
                 *frame->closure->upvalues[slot]->location = peek(0);
                 break;
             }
+            case OP_GET_INDEX:{
+              if(!IS_INSTANCE(peek(0))){
+                    runtimeError("Only instances have properties.");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                Value value = pop();
+                ObjString* name = AS_STRING(value);
+                ObjInstance* instance = AS_INSTANCE(peek(0));
+                Value value;
+                if(tableGet(&instance->fields, name, &value)){
+                    pop(); //instance
+                    push(value);
+                    // break;
+                } else {
+                    pop();
+                    push(NIL_VAL);
+                }
+                break;
+            }
+            case OP_SET_INDEX:{
+                if(!IS_INSTANCE(peek(1))){
+                    runtimeError("Can only set properties on instances.");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                Value value = pop();
+                ObjString* name = AS_STRING(value);
+                ObjInstance* instance = AS_INSTANCE(peek(1));
+                tableSet(&instance->fields, name, value);
+                Value value = pop();
+                pop();
+                push(value);
+                break;
+            }
+
             case OP_GET_PROPERTY:{
                 if(!IS_INSTANCE(peek(0))){
                     runtimeError("Only instances have properties.");

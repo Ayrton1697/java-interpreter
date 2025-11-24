@@ -8,3 +8,14 @@ print pair.second;
 print pair.first;
 
 print pair.first*3 + pair.second;
+
+var first = "first";
+var second = "second";
+
+var test = first + second;
+print test;
+
+pair.test = "testttt";
+
+print pair.firstsecond;
+
