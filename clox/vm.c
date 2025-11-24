@@ -316,7 +316,22 @@ static InterpretResult run(){
                 push(value);
                 break;
             }
-
+            case OP_DELETE_PROPERTY:{
+                if(!IS_INSTANCE(peek(0))){
+                    runtimeError("Can only delete properties from instances.");
+                    return INTERPRET_RUNTIME_ERROR;
+                }    
+                ObjInstance* instance = AS_INSTANCE(peek(0));
+                ObjString* name = READ_STRING();
+                if(tableDelete(&instance->fields, name)){
+                    pop();
+                    push(NIL_VAL);
+                } else {
+                    runtimeError("Undefined property '%s'.", name->chars);
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                break;
+            }
             case OP_GET_PROPERTY:{
                 if(!IS_INSTANCE(peek(0))){
                     runtimeError("Only instances have properties.");

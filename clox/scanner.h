@@ -26,7 +26,8 @@ typedef enum {
     TOKEN_ERROR, TOKEN_EOF,
 
     // challenge class chap28
-    TOKEN_LEFT_BRACKET,TOKEN_RIGHT_BRACKET
+    TOKEN_LEFT_BRACKET,TOKEN_RIGHT_BRACKET,
+    TOKEN_DELETE
     
 } TokenType;
 

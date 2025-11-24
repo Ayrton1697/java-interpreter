@@ -426,6 +426,18 @@ static void dot(bool canAssign){
 
 }
 
+static void deleteField(bool canAssign){
+    // delete obj.field
+    parsePrecedence(PREC_PRIMARY);
+    if(match(TOKEN_DOT)){
+        consume(TOKEN_IDENTIFIER, "Expect object after delete statement.");
+        uint8_t name = identifierConstant(&parser.previous);
+        emitBytes(OP_DELETE_PROPERTY, name);
+    } else {
+        error("Expect '.' after object in delete statement.");
+    } 
+}
+
 static void literal(bool canAssign){
     switch(parser.previous.type){
         case TOKEN_FALSE: emitByte(OP_FALSE); break;
@@ -654,6 +666,8 @@ static void declaration(){
 static void statement(){
     if(match(TOKEN_PRINT)){
         printStatement();
+    // } else if(match(TOKEN_DELETE)) {
+    //     deleteField();
     } else if(match(TOKEN_FOR)) {
         forStatement();
     } else if(match(TOKEN_IF)) {
@@ -780,6 +794,7 @@ ParseRule rules[] = {
     [TOKEN_WHILE] = {NULL, NULL, PREC_NONE},
     [TOKEN_ERROR] = {NULL, NULL, PREC_NONE},
     [TOKEN_EOF] = {NULL, NULL, PREC_NONE},
+    [TOKEN_DELETE] = {deleteField, NULL, PREC_NONE},
 };
 
 static void parsePrecedence(Precedence precedence){
