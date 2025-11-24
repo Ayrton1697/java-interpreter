@@ -286,10 +286,14 @@ static InterpretResult run(){
                 if(tableGet(&instance->fields, name, &value)){
                     pop(); //instance
                     push(value);
-                    break;
+                    // break;
+                } else {
+                    pop();
+                    push(NIL_VAL);
                 }
-                runtimeError("Undefined property '%s'.", name->chars);
-                return INTERPRET_RUNTIME_ERROR;
+                break;
+                // runtimeError("Undefined property '%s'.", name->chars);
+                // return INTERPRET_RUNTIME_ERROR;
             }
             case OP_SET_PROPERTY:{
                 if(!IS_INSTANCE(peek(1))){
