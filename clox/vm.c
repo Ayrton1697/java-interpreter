@@ -276,15 +276,18 @@ static InterpretResult run(){
                 break;
             }
             case OP_GET_INDEX:{
-              if(!IS_INSTANCE(peek(0))){
+              if(!IS_INSTANCE(peek(1))){
                     runtimeError("Only instances have properties.");
                     return INTERPRET_RUNTIME_ERROR;
                 }
-                Value value = pop();
-                ObjString* name = AS_STRING(value);
+                Value varName = pop();
+                if(!IS_STRING(varName)){
+                    runtimeError("Can only set properties on instances.");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
                 ObjInstance* instance = AS_INSTANCE(peek(0));
                 Value value;
-                if(tableGet(&instance->fields, name, &value)){
+                if(tableGet(&instance->fields, AS_STRING(varName), &value)){
                     pop(); //instance
                     push(value);
                     // break;
@@ -295,15 +298,20 @@ static InterpretResult run(){
                 break;
             }
             case OP_SET_INDEX:{
-                if(!IS_INSTANCE(peek(1))){
+                if(!IS_INSTANCE(peek(2))){
                     runtimeError("Can only set properties on instances.");
                     return INTERPRET_RUNTIME_ERROR;
                 }
                 Value value = pop();
-                ObjString* name = AS_STRING(value);
-                ObjInstance* instance = AS_INSTANCE(peek(1));
-                tableSet(&instance->fields, name, value);
+                Value varName = pop();
+                if(!IS_STRING(varName)){
+                    runtimeError("Indexes can only be strings!.");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                ObjInstance* instance = AS_INSTANCE(peek(2));
+                tableSet(&instance->fields, AS_STRING(varName), value);
                 Value value = pop();
+                pop();
                 pop();
                 push(value);
                 break;
