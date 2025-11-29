@@ -18,7 +18,7 @@
 #define IS_STRING(value) isObjType(value, OBJ_STRING)
 
 
-#define AS_OBJ_BOUND_METHOD(value) ((ObjBoundMethod*)AS_OBJ(value))
+#define AS_BOUND_METHOD(value) ((ObjBoundMethod*)AS_OBJ(value))
 #define AS_CLASS(value) ((ObjClass*)AS_OBJ(value))
 #define AS_CLOSURE(value) ((ObjClosure*)AS_OBJ(value))
 #define AS_INSTANCE(value) ((ObjInstance*)AS_OBJ(value))
