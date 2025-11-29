@@ -55,6 +55,7 @@ typedef struct{
 
 typedef enum{
     TYPE_FUNCTION,
+    TYPE_METHOD,
     TYPE_SCRIPT
 } FunctionType;
 
@@ -70,8 +71,13 @@ typedef struct Compiler{
     int scopeDepth;
 } Compiler; 
 
+typedef struct ClassCompiler{
+    struct ClassCompiler* enclosing;
+} ClassCompiler;
+
 Parser parser;
 Compiler* current = NULL;
+ClassCompiler* currentClass = NULL;
 
 static Chunk* currentChunk(){
     return &current->function->chunk;
@@ -200,8 +206,15 @@ static void initCompiler(Compiler* compiler, FunctionType type){
     Local* local = &current->locals[current->localCount++];
     local->depth = 0;
     local->isCaptured = false;
-    local->name.start = "";
-    local->name.length = 0;
+
+    if(type != TYPE_FUNCTION){
+        local->name.start = "this";
+        local->name.length = 4;
+    } else {
+        local->name.start = "";
+        local->name.length = 0;
+    }
+
 }
 
 static ObjFunction* endCompiler(){
@@ -465,7 +478,7 @@ static void function(FunctionType type){
 static void method(){
     consume(TOKEN_IDENTIFIER, "Expected method name.");
     uint8_t constant = identifierConstant(&parser.previous);
-    FunctionType type = TYPE_FUNCTION;
+    FunctionType type = TYPE_METHOD;
     function(type);
     emitBytes(OP_METHOD, constant);
 }
