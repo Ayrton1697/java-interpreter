@@ -179,9 +179,16 @@ static bool invoke(ObjString* name, int argCount){
 
 static bool bindMethod(ObjClass* klass, ObjString* name){
     Value method;
+    if(name == vm.initString){
+        if(IS_NIL(klass->initMethod)){
+            return false;
+        }
+        method = klass->initMethod;
+    } else {
     if(!tableGet(&klass->methods, name, &method)){
         runtimeError("Undefined property '%s'.", name->chars);
         return false;
+    }
     }
 
     ObjBoundMethod* bound = newBoundMethod(peek(0), AS_CLOSURE(method));
