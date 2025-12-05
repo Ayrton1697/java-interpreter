@@ -285,7 +285,7 @@ static int resolveLocal(Compiler* compiler,Token* name){
     for(int i = compiler->localCount - 1; i>=0; i--){
         Local* local = &compiler->locals[i];
         if(identifiersEqual(name, &local->name)){
-            if(local->depth = -1){
+            if(local->depth == -1){
                 error("Cant read local variable in its own initializer.");
             }
             return i;
@@ -787,7 +787,7 @@ ParseRule rules[] = {
     [TOKEN_LEFT_PAREN] = {grouping, call, PREC_CALL},
     [TOKEN_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
     [TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE},
-    [TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE},
+    [TOKEN_RIGHT_BRACE] = {NULL, NULL, PREC_NONE},
     [TOKEN_COMMA] = {NULL, NULL, PREC_NONE},
     [TOKEN_DOT] = {NULL, dot, PREC_CALL},
     [TOKEN_MINUS] = {unary, binary, PREC_TERM},
