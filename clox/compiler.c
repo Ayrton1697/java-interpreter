@@ -518,6 +518,16 @@ static void classDeclaration(){
     emitByte(OP_POP);
 
     currentClass = currentClass->enclosing;
+
+    if(match(TOKEN_LESS)){
+        consume(TOKEN_IDENTIFIER, "Expect superclass name.");
+        variable(false);
+        if(identifiersEqual(&className, &parser.previous)){
+            error("A class can´t inherit from itself");
+        }
+        namedVariable(className, false);
+        emitByte(OP_INHERIT);
+    }
 }
 
 static void funDeclaration(){
