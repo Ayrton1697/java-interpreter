@@ -525,8 +525,17 @@ static void classDeclaration(){
         if(identifiersEqual(&className, &parser.previous)){
             error("A class can´t inherit from itself");
         }
+
+        beginScope();
+        addLocal(syntheticToken("super"));
+        defineVariable(0);
+
         namedVariable(className, false);
         emitByte(OP_INHERIT);
+
+        if(classCompiler.hasSuperclass){
+            endScope();
+        }
     }
 }
 
