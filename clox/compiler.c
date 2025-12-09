@@ -518,6 +518,25 @@ static void classDeclaration(){
     emitByte(OP_POP);
 
     currentClass = currentClass->enclosing;
+
+    if(match(TOKEN_LESS)){
+        consume(TOKEN_IDENTIFIER, "Expect superclass name.");
+        variable(false);
+        if(identifiersEqual(&className, &parser.previous)){
+            error("A class can´t inherit from itself");
+        }
+
+        beginScope();
+        addLocal(syntheticToken("super"));
+        defineVariable(0);
+
+        namedVariable(className, false);
+        emitByte(OP_INHERIT);
+
+        if(classCompiler.hasSuperclass){
+            endScope();
+        }
+    }
 }
 
 static void funDeclaration(){

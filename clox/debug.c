@@ -140,6 +140,9 @@ int dissasembleInstruction(Chunk* chunk, int offset){
         return simpleInstruction("OP_PRINT", offset);
     case OP_CLASS:
         return constantInstruction("OP_CLASS", chunk,  offset);
+    case OP_INHERIT:
+        return simpleInstruction("OP_INHERIT", offset);
+        break;
     case OP_METHOD:
         return constantInstruction("OP_METHOD", chunk,  offset);
     default:
