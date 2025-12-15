@@ -74,10 +74,12 @@ typedef struct Compiler{
 
 typedef struct ClassCompiler{
     struct ClassCompiler* enclosing;
+    bool hasSuperclass;
 } ClassCompiler;
 
 Parser parser;
 Compiler* current = NULL;
+
 ClassCompiler* currentClass = NULL;
 
 static Chunk* currentChunk(){
@@ -506,6 +508,7 @@ static void classDeclaration(){
     defineVariable(nameConstant);
 
     ClassCompiler classCompiler;
+    classCompiler.hasSuperclass = false;
     classCompiler.enclosing = currentClass;
     currentClass = &classCompiler;
 
@@ -532,6 +535,7 @@ static void classDeclaration(){
 
         namedVariable(className, false);
         emitByte(OP_INHERIT);
+        classCompiler.hasSuperclass = true;
 
         if(classCompiler.hasSuperclass){
             endScope();
@@ -779,6 +783,19 @@ static void variable(bool canAssign){
     namedVariable(parser.previous, canAssign);
 }
 
+static Token syntheticToken(const char* text){
+        Token token;
+        token.start = text;
+        token.length = (int)strlen(text);
+        return token;
+}
+
+static void super_(bool canAssign){
+    consume(TOKEN_DOT, "Expect '.' after 'super'.");
+    consume(TOKEN_IDENTIFIER, "Expect superclass method name.");
+    uint8_t name = identifierConstant(&parser.previous);
+}
+
 static void this_(bool canAssign){
 
     if(currentClass == NULL){
@@ -836,7 +853,7 @@ ParseRule rules[] = {
     [TOKEN_OR] = {NULL, or_, PREC_OR},
     [TOKEN_PRINT] = {NULL, NULL, PREC_NONE},
     [TOKEN_RETURN] = {NULL, NULL, PREC_NONE},
-    [TOKEN_SUPER] = {NULL, NULL, PREC_NONE},
+    [TOKEN_SUPER] = {super_, NULL, PREC_NONE},
     [TOKEN_THIS] = {this_, NULL, PREC_NONE},
     [TOKEN_TRUE] = {literal, NULL, PREC_NONE},
     [TOKEN_VAR] = {NULL, NULL, PREC_NONE},
