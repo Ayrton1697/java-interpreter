@@ -498,12 +498,13 @@ static void method(Token className){
     void* copiedClass = memcpy(allocatedClass, className.start, className.length);
     allocatedClass[className.length] = '_';
   
-    char* copiedMethod = memcpy(allocatedClass + className.length + 2, parser.previous.start, parser.previous.length);
+    char* copiedMethod = memcpy(allocatedClass + className.length + 1, parser.previous.start, parser.previous.length);
 
-    copiedMethod[parser.previous.length+1] = '\0';
+    copiedMethod[parser.previous.length] = '\0';
 
     ObjString* newMethodName = takeString(allocatedClass, className.length + 1 + parser.previous.length);
-    uint8_t constant = identifierConstant(newMethodName);
+
+    uint8_t constant = makeConstant(OBJ_VAL(newMethodName));
   
     FunctionType type = TYPE_METHOD;
     if(parser.previous.length == 4 && memcmp(parser.previous.start, "init", 4) == 0){
