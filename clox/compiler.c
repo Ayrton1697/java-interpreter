@@ -487,9 +487,22 @@ static void function(FunctionType type){
     }
 }
 
-static void method(){
+static void method(Token className){
     consume(TOKEN_IDENTIFIER, "Expected method name.");
-    uint8_t constant = identifierConstant(&parser.previous);
+
+    // NO! BORRAR LO DE ABAJO! HAY QUE USAR MEMCP PARA DEJAR LOS DOS STRINGS UNO AL LADO DEL OTRO EN MEMORIA CON EL _ EN EL MEDIO PRIMERO!
+    // Si el metodo es bark y la clase es Dog, aca lo transformamos en dog_bark
+
+    char* allocatedClass = ALLOCATE(char, className.length + 1 + parser.previous.length + 1);
+    
+    void* copiedClass = memcpy(allocatedClass, className.start, className.length);
+    allocatedClass[className.length] = '_';
+
+    void* copiedMethod = memcpy(allocatedClass + className.length + 1, parser.previous.start, parser.previous.length);
+
+    ObjString* newMethodName = takeString(allocatedClass, className.length + 1 + parser.previous.length);
+    uint8_t constant = identifierConstant(newMethodName);
+  
     FunctionType type = TYPE_METHOD;
     if(parser.previous.length == 4 && memcmp(parser.previous.start, "init", 4) == 0){
         type = TYPE_INITIALIZER;
@@ -515,7 +528,7 @@ static void classDeclaration(){
     namedVariable(className,false);
     consume(TOKEN_LEFT_BRACE, "Expect '{' before class body.");
     while(!check(TOKEN_RIGHT_BRACE) && !check(TOKEN_EOF)){
-        method();
+        method(className);
     }
     consume(TOKEN_RIGHT_BRACE, "Expect '}' after class body.");
     emitByte(OP_POP);
