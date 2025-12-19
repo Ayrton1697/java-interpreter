@@ -497,8 +497,10 @@ static void method(Token className){
     
     void* copiedClass = memcpy(allocatedClass, className.start, className.length);
     allocatedClass[className.length] = '_';
+  
+    char* copiedMethod = memcpy(allocatedClass + className.length + 2, parser.previous.start, parser.previous.length);
 
-    void* copiedMethod = memcpy(allocatedClass + className.length + 1, parser.previous.start, parser.previous.length);
+    copiedMethod[parser.previous.length+1] = '\0';
 
     ObjString* newMethodName = takeString(allocatedClass, className.length + 1 + parser.previous.length);
     uint8_t constant = identifierConstant(newMethodName);
