@@ -423,16 +423,30 @@ static void call(bool canAssign){
 
 static void dot(bool canAssign){
     consume(TOKEN_IDENTIFIER, "Expect property name afer '.'.");
-    uint8_t name = identifierConstant(&parser.previous);
+    uint8_t name;
+
+    // fields privados van a ser tipo _bark
+    if(&parser.previous.start == "_" && currentClass != NULL){
+        // es un field privado
+        Token className = currentClass->name;
+        uint8_t name = identifierConstant(&parser.previous);
+        // alocar memoria y pasar el nombre nuevo
+    } else {
+        uint8_t name = identifierConstant(&parser.previous);
+    }
+    
 
     if(canAssign && match(TOKEN_EQUAL)){
+        // dog.bark = "test"
         expression();
         emitBytes(OP_SET_PROPERTY, name);
     } else if (match(TOKEN_LEFT_PAREN)) {
+        // dog.bark()
         uint8_t argCount = argumentList();
         emitBytes(OP_INVOKE, name);
         emitByte(argCount);
     } else {
+        // dog.bark
         emitBytes(OP_GET_PROPERTY, name);
     }
 
