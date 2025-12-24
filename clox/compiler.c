@@ -427,17 +427,16 @@ static void dot(bool canAssign){
     uint8_t name;
 
     // fields privados van a ser tipo _bark
-    if(parser.previous.start[0] == "_" && currentClass != NULL){
+    if(parser.previous.start[0] == '_' && currentClass != NULL){
         // es un field privado
         Token className = *currentClass->className;
-        uint8_t name = identifierConstant(&parser.previous);
         // alocar memoria y pasar el nombre nuevo
         char* nameAlloc = ALLOCATE(char, className.length + parser.previous.length + 1); //alocamos espacio para class_field + null terminator
         char* copiedClass = memcpy(nameAlloc, className.start, className.length);
-        copiedClass[className.length] = "\0";
+        nameAlloc[className.length + parser.previous.length] = '\0';
         char* copiedMethod= memcpy(copiedClass + className.length, parser.previous.start, parser.previous.length);
 
-        ObjString* newMethodName = takeString(nameAlloc, className.length + 1 + parser.previous.length);
+        ObjString* newMethodName = takeString(nameAlloc, className.length + parser.previous.length);
 
         name = makeConstant(OBJ_VAL(newMethodName));
 
