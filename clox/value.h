@@ -19,7 +19,7 @@ typedef struct ObjString ObjString;
 
 typedef uint64_t Value;
 
-#define IS_BOOL(value) (((vaue) | 1) == TRUE_VAL)
+#define IS_BOOL(value) (((value) | 1) == TRUE_VAL)
 #define IS_NIL(value) ((value) == NIL_VAL)
 #define IS_NUMBER(value) (((value) & QNAN) != QNAN)
 #define IS_OBJ(value) \
